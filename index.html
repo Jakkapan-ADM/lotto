@@ -306,6 +306,15 @@
   </div>
 
   <div class="card">
+    <h2>วิเคราะห์เคสที่สองสูตรตรงกัน</h2>
+    <p class="sub">กรองเฉพาะงวดที่ "สองหลักท้ายรางวัลที่ 1 งวดก่อน" กับ "หลักหน่วยเลขท้ายงวดก่อน" ลงท้ายด้วยเลขเดียวกันพอดี (สองสมมติฐานชี้ไปทางเดียวกัน) แล้วเทียบว่าในเคสแบบนี้ อัตราที่เลขท้าย 2 ตัวงวดถัดไปออกตรงกับสองหลักท้ายรางวัลที่ 1 จริงๆ สูงกว่าค่าเฉลี่ยทั่วไปหรือไม่</p>
+    <button id="analyze-conjunction-btn">วิเคราะห์เคสที่ตรงกัน</button>
+    <div id="conjunction-result" style="margin-top:16px;">
+      <p class="empty-hint">ยังไม่ได้วิเคราะห์ ลองกดปุ่มด้านบนหลังบันทึกประวัติหลายๆ งวดแล้ว</p>
+    </div>
+  </div>
+
+  <div class="card">
     <details class="formula" id="formula-details">
       <summary>สูตรที่ใช้คำนวณ (คลิกเพื่อดูรายละเอียด)</summary>
       <p><b style="color:var(--maroon-dark)">เลขท้าย 2 ตัว</b></p>
@@ -954,6 +963,88 @@ document.getElementById('bulk-clear-btn').addEventListener('click', () => {
 });
 
 document.getElementById('analyze-btn').addEventListener('click', analyzeConnections);
+
+function analyzeConjunction() {
+  const sorted = getSortedHistoryWithDate();
+  const resultEl = document.getElementById('conjunction-result');
+
+  if (sorted.length < 3) {
+    resultEl.innerHTML = '<p class="empty-hint">ต้องมีประวัติอย่างน้อย 3 งวดขึ้นไปถึงจะวิเคราะห์ได้</p>';
+    return;
+  }
+
+  let overallTotal = 0, overallHits = 0;
+  let subsetTotal = 0, subsetHits = 0;
+  const subsetMatches = [];
+
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const prev = sorted[i], next = sorted[i + 1];
+    if (!prev.first || !prev.last2 || !next.last2) continue;
+
+    const predicted = prev.first.slice(-2);
+    const isHit = predicted === next.last2;
+
+    overallTotal++;
+    if (isHit) overallHits++;
+
+    const agree = prev.first.slice(-1) === prev.last2.slice(-1);
+    if (agree) {
+      subsetTotal++;
+      if (isHit) { subsetHits++; subsetMatches.push(`${prev.date} → ${next.date} (ทาย ${predicted}, ออกจริง ${next.last2})`); }
+    }
+  }
+
+  if (overallTotal === 0) {
+    resultEl.innerHTML = '<p class="empty-hint">ยังไม่มีคู่งวดที่มีทั้งรางวัลที่ 1 และเลขท้าย 2 ตัวครบทั้งสองงวดติดกัน ลองเพิ่มข้อมูลรางวัลที่ 1 ให้ครบขึ้น</p>';
+    return;
+  }
+
+  const overallRate = overallHits / overallTotal;
+  const subsetRate = subsetTotal > 0 ? subsetHits / subsetTotal : null;
+  const baseline = 0.01;
+
+  const boosted = subsetTotal >= 5 && subsetRate !== null && subsetRate > overallRate * 1.5 && subsetHits >= 2;
+  const verdictHtml = subsetTotal < 5
+    ? '<span class="verdict chance">ตัวอย่างน้อยเกินไปจะสรุป</span>'
+    : boosted
+      ? '<span class="verdict notable">สูงกว่าค่าเฉลี่ยทั่วไปจริง</span>'
+      : '<span class="verdict chance">ไม่ต่างจากค่าเฉลี่ยทั่วไป</span>';
+
+  const matchListHtml = subsetMatches.length > 0
+    ? `<div class="match-list" style="margin-top:8px;">ตัวอย่างที่ตรง: ${subsetMatches.slice(0, 5).join('; ')}${subsetMatches.length > 5 ? ` และอีก ${subsetMatches.length - 5} ครั้ง` : ''}</div>`
+    : '';
+
+  resultEl.innerHTML = `
+    <table class="analysis" style="margin-bottom:10px;">
+      <thead><tr><th></th><th>ทายถูก/ทั้งหมด</th><th>อัตราถูกจริง</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>เคสที่สองสมมติฐานตรงกัน (สองหลักท้ายรางวัลที่1 ลงท้ายเดียวกับเลขท้าย 2 ตัว งวดก่อน)</td>
+          <td>${subsetHits}/${subsetTotal}</td>
+          <td>${subsetRate !== null ? (subsetRate * 100).toFixed(1) + '%' : '-'}</td>
+        </tr>
+        <tr>
+          <td>ค่าเฉลี่ยทั่วไป (ทุกงวดที่มีข้อมูลครบ ไม่กรองเงื่อนไข)</td>
+          <td>${overallHits}/${overallTotal}</td>
+          <td>${(overallRate * 100).toFixed(1)}%</td>
+        </tr>
+        <tr>
+          <td>โอกาสสุ่มล้วนๆ (ทายเลข 2 หลักตรงเป๊ะ)</td>
+          <td>-</td>
+          <td>${(baseline * 100).toFixed(0)}%</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="text-align:center; margin-bottom:10px;">${verdictHtml}</div>
+    ${matchListHtml}
+    <div class="analysis-caveat">
+      พบเคสที่สองสมมติฐานตรงกันแบบนี้ ${subsetTotal} ครั้ง จาก ${overallTotal} คู่งวดทั้งหมดที่มีข้อมูลครบ (คิดเป็น ${((subsetTotal / overallTotal) * 100).toFixed(0)}% ของคู่งวดทั้งหมด ซึ่งใกล้เคียงกับที่คาดว่าจะบังเอิญตรงกันเองอยู่แล้วที่ราว 10% เพราะเป็นการเทียบหลักหน่วย 1 หลัก)
+      ถ้าอัตราถูกจริงในเคสนี้ไม่ได้สูงกว่าค่าเฉลี่ยทั่วไปอย่างชัดเจน แปลว่าการที่สองสมมติฐานบังเอิญชี้ไปทางเดียวกัน ไม่ได้ทำให้เลขนั้นมีโอกาสออกจริงเพิ่มขึ้นแต่อย่างใด สอดคล้องกับหลักการที่ว่าการออกรางวัลแต่ละงวดเป็นการสุ่มที่เป็นอิสระต่อกันทางสถิติ ไม่ว่าจะมีกี่สูตรมาชี้ไปที่เลขเดียวกันก็ตาม
+    </div>
+  `;
+}
+
+document.getElementById('analyze-conjunction-btn').addEventListener('click', analyzeConjunction);
 document.getElementById('calc-btn').addEventListener('click', calculate);
 document.getElementById('explain-btn').addEventListener('click', () => {
   const d = document.getElementById('formula-details');
