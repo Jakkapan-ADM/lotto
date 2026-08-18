@@ -159,6 +159,8 @@
   }
   .verdict.notable { background: #E4EFE0; color: #2F6B3E; }
   .verdict.chance { background: #EFE7DC; color: var(--ink-soft); }
+  .verdict.hit { background: #E4EFE0; color: #2F6B3E; }
+  .verdict.miss { background: #F3E3E3; color: #8B3A3A; }
   .analysis-meta { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 12px; }
   .analysis-caveat {
     background: var(--paper); border-radius: 8px; padding: 12px 14px; margin-top: 14px;
@@ -304,6 +306,15 @@
   </div>
 
   <div class="card">
+    <h2>ตรวจผลย้อนหลัง: ที่เคยทาย ถูกไหม</h2>
+    <p class="sub">ทุกครั้งที่กด "คำนวณเลขเด่น" ระบบจะจำเลขที่ทายไว้ตามวันที่งวดนั้นให้อัตโนมัติ พอคุณบันทึกผลจริงของงวดนั้นลงในประวัติแล้ว กดปุ่มด้านล่างเพื่อเทียบว่าที่เคยทายไว้ ถูกกี่ครั้ง</p>
+    <button id="check-accuracy-btn">ตรวจผลย้อนหลัง</button>
+    <div id="accuracy-result" style="margin-top:16px;">
+      <p class="empty-hint">ยังไม่มีข้อมูลให้ตรวจ ต้องเคยกด "คำนวณเลขเด่น" ไว้ก่อน แล้วบันทึกผลจริงของงวดนั้นในประวัติด้วย</p>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>วิศวกรรมย้อนกลับ: หาความเชื่อมโยงระหว่างงวด</h2>
     <p class="sub">ทดสอบสมมติฐานหลายแบบกับประวัติที่บันทึกไว้ (เรียงตามวันที่) ว่างวดหนึ่งเชื่อมโยงกับงวดถัดไปด้วยวิธีใดบ้าง แล้วคำนวณอัตราที่ทายถูกจริงเทียบกับโอกาสสุ่มล้วนๆ</p>
     <button id="analyze-btn">วิเคราะห์ความเชื่อมโยง</button>
@@ -344,6 +355,8 @@
 <script>
 const STORAGE_KEY = 'lottery-history-th';
 const BIRTHDATE_KEY = 'lottery-birthdate-th';
+const PREDICTIONS_KEY = 'lottery-predictions-th';
+let predictions = {};
 let history = [];
 
 const ZODIAC_BY_MONTH = {
@@ -383,6 +396,10 @@ function loadHistory() {
     const b = localStorage.getItem(BIRTHDATE_KEY);
     if (b) document.getElementById('birth-date-input').value = b;
   } catch (e) {}
+  try {
+    const p = localStorage.getItem(PREDICTIONS_KEY);
+    if (p) predictions = JSON.parse(p);
+  } catch (e) { predictions = {}; }
   autofillPrevLast2();
   renderAll();
 }
@@ -395,6 +412,12 @@ function saveHistory() {
 function saveBirthdate(val) {
   try { localStorage.setItem(BIRTHDATE_KEY, val); }
   catch (e) {}
+}
+
+function savePrediction(dateISO, record) {
+  predictions[dateISO] = record;
+  try { localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(predictions)); }
+  catch (e) { console.error('บันทึกเลขที่คำนวณไว้ไม่สำเร็จ', e); }
 }
 
 function autofillPrevLast2() {
@@ -523,7 +546,16 @@ function calculate() {
     ? 'พบเลขซ้ำกับประวัติที่บันทึกไว้ ตามเคล็ดให้ลองกลับคู่ตัวเลขไว้เป็นชุดสำรองด้วย'
     : '';
 
-  renderConnectionNumbers(prevLast2, draw);
+  const conn = renderConnectionNumbers(prevLast2, draw);
+
+  savePrediction(drawDateVal, {
+    last2: last2Result,
+    last2Reversed: last2Reversed,
+    first3: firstResult,
+    first3Reversed: firstReversed,
+    conn: conn,
+    savedAt: Date.now()
+  });
 }
 
 function renderConnectionNumbers(prevLast2, draw) {
@@ -533,24 +565,30 @@ function renderConnectionNumbers(prevLast2, draw) {
   const prevFirst = mostRecent && mostRecent.first ? mostRecent.first : null;
 
   const rows = [];
+  const conn = {};
 
   // 1. หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป
   const unitsDigit = prevLast2.slice(-1);
+  conn.unitsDigit = unitsDigit;
   rows.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: `ลงท้าย ${unitsDigit}` });
 
   // 2. สองหลักท้ายรางวัลที่ 1 ของงวดก่อน
   if (prevFirst) {
+    conn.prevFirst2 = prevFirst.slice(-2);
     rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: prevFirst.slice(-2) });
   } else {
+    conn.prevFirst2 = null;
     rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
   }
 
   // 3. เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป
   const sumdate = pad2(parseInt(prevLast2, 10) + draw.day + draw.month);
+  conn.sumdate = sumdate;
   rows.push({ label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป', value: sumdate });
 
   // 4. เลขท้ายงวดก่อนกลับหลักในงวดถัดไป
   const reversedPrev = reverse2(prevLast2);
+  conn.reversedPrev = reversedPrev;
   rows.push({ label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป', value: reversedPrev });
 
   list.innerHTML = rows.map(r => `
@@ -561,6 +599,7 @@ function renderConnectionNumbers(prevLast2, draw) {
   `).join('');
 
   block.style.display = 'block';
+  return conn;
 }
 
 function getSortedHistoryWithDate() {
@@ -635,6 +674,93 @@ function runFormula(f, sorted) {
   }
   return { ...f, hits, total, rate: total > 0 ? hits / total : 0, matchedPairs };
 }
+
+function checkAccuracy() {
+  const resultEl = document.getElementById('accuracy-result');
+  const predDates = Object.keys(predictions);
+
+  if (predDates.length === 0) {
+    resultEl.innerHTML = '<p class="empty-hint">ยังไม่เคยกด "คำนวณเลขเด่น" เลย ลองคำนวณก่อนอย่างน้อย 1 ครั้ง</p>';
+    return;
+  }
+
+  const historyByDate = {};
+  history.forEach(h => { if (h.date) historyByDate[h.date] = h; });
+
+  const rows = predDates
+    .filter(d => historyByDate[d])
+    .sort((a, b) => b.localeCompare(a))
+    .map(d => {
+      const p = predictions[d];
+      const actual = historyByDate[d];
+      const actualLast2 = actual.last2 || null;
+      const actualFirst3 = actual.first ? actual.first.slice(-3) : null;
+
+      const checks = [];
+      if (actualLast2) {
+        checks.push({ label: 'เลขท้าย 2 ตัว (สูตรหลัก)', hit: p.last2 === actualLast2 || p.last2Reversed === actualLast2, predicted: `${p.last2} / ${p.last2Reversed}` });
+      }
+      if (actualFirst3) {
+        checks.push({ label: 'รางวัลที่ 1 (3 หลักท้าย)', hit: p.first3 === actualFirst3 || p.first3Reversed === actualFirst3, predicted: `${p.first3} / ${p.first3Reversed}` });
+      }
+      if (actualLast2 && p.conn) {
+        checks.push({ label: 'หลักหน่วยงวดก่อน', hit: p.conn.unitsDigit === actualLast2.slice(-1), predicted: `ลงท้าย ${p.conn.unitsDigit}` });
+        if (p.conn.prevFirst2) checks.push({ label: 'สองหลักท้ายรางวัลที่1 งวดก่อน', hit: p.conn.prevFirst2 === actualLast2, predicted: p.conn.prevFirst2 });
+        checks.push({ label: 'เลขท้ายงวดก่อน+วัน/เดือน', hit: p.conn.sumdate === actualLast2, predicted: p.conn.sumdate });
+        checks.push({ label: 'เลขท้ายงวดก่อนกลับหลัก', hit: p.conn.reversedPrev === actualLast2, predicted: p.conn.reversedPrev });
+      }
+
+      return { date: d, actualLast2, actualFirst3, checks };
+    });
+
+  if (rows.length === 0) {
+    resultEl.innerHTML = '<p class="empty-hint">มีเลขที่เคยทายไว้ แต่ยังไม่พบผลจริงของงวดนั้นในประวัติ ลองเพิ่มผลจริงของงวดที่ตรงวันที่เดียวกันในการ์ด "เพิ่มผลรางวัลงวดก่อนหน้า" ก่อน</p>';
+    return;
+  }
+
+  // overall tally per check label
+  const tally = {};
+  rows.forEach(r => r.checks.forEach(c => {
+    if (!tally[c.label]) tally[c.label] = { hits: 0, total: 0 };
+    tally[c.label].total++;
+    if (c.hit) tally[c.label].hits++;
+  }));
+
+  const detailRows = rows.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.actualLast2 || '-'}${r.actualFirst3 ? ` / ${r.actualFirst3}` : ''}</td>
+      <td>
+        ${r.checks.map(c => `<div style="margin-bottom:4px;"><span class="verdict ${c.hit ? 'hit' : 'miss'}">${c.hit ? '✓ ถูก' : '✗ ไม่ถูก'}</span> <span style="font-size:11.5px; color:var(--ink-soft);">${c.label} (ทาย ${c.predicted})</span></div>`).join('')}
+      </td>
+    </tr>
+  `).join('');
+
+  const summaryRows = Object.entries(tally).map(([label, t]) => `
+    <tr>
+      <td>${label}</td>
+      <td>${t.hits}/${t.total}</td>
+      <td>${((t.hits / t.total) * 100).toFixed(1)}%</td>
+    </tr>
+  `).join('');
+
+  resultEl.innerHTML = `
+    <p class="analysis-meta">เทียบได้ ${rows.length} งวดที่มีทั้งเลขที่เคยทายไว้และผลจริงในประวัติ</p>
+    <table class="analysis" style="margin-bottom:18px;">
+      <thead><tr><th>สรุปตามวิธีทาย</th><th>ถูก/ทั้งหมด</th><th>อัตราถูก</th></tr></thead>
+      <tbody>${summaryRows}</tbody>
+    </table>
+    <table class="analysis">
+      <thead><tr><th>งวดวันที่</th><th>ผลจริง</th><th>รายละเอียดที่ทายไว้</th></tr></thead>
+      <tbody>${detailRows}</tbody>
+    </table>
+    <div class="analysis-caveat">
+      อัตราถูกจากการตรวจย้อนหลังนี้คือของจริงที่คุณทายไว้เอง (ไม่ใช่ทดสอบย้อนหลังทั้งชุดข้อมูลแบบการ์ดด้านล่าง) ยิ่งสะสมหลายงวดยิ่งเห็นภาพว่าวิธีไหนแม่นกว่าโอกาสสุ่มจริงหรือไม่ — เทียบกับโอกาสสุ่มล้วนๆ ที่ประมาณ 1% สำหรับทาย 2-3 หลักตรง และ 10% สำหรับทายหลักหน่วยอย่างเดียว
+    </div>
+  `;
+}
+
+document.getElementById('check-accuracy-btn').addEventListener('click', checkAccuracy);
 
 function analyzeConnections() {
   const sorted = getSortedHistoryWithDate();
