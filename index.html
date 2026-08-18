@@ -298,7 +298,7 @@
 
   <div class="card">
     <h2>วิศวกรรมย้อนกลับ: หาความเชื่อมโยงระหว่างงวด</h2>
-    <p class="sub">ทดสอบสมมติฐานหลายแบบกับประวัติที่บันทึกไว้ (เรียงตามวันที่) ว่างวดหนึ่งเชื่อมโยงกับงวดถัดไปด้วยวิธีใดบ้าง แล้วคำนวณอัตราที่ทายถูกจริงเทียบกับโอกาสสุ่มล้วนๆ</p>
+    <p class="sub">ทดสอบทั้งสูตรหลัก (คำนวณจากวันเกิด+วันงวด) และสมมติฐานความเชื่อมโยงทั้ง 4 แบบ กับประวัติทุกงวดที่บันทึกไว้ (เรียงตามวันที่) ว่างวดหนึ่งทำนายงวดถัดไปได้จริงแค่ไหน เทียบกับโอกาสสุ่มล้วนๆ — ต้องกรอกวันเกิดในการ์ดด้านบนก่อน ถึงจะรวมสูตรหลักรางวัลที่ 1 ได้ด้วย</p>
     <button id="analyze-btn">วิเคราะห์ความเชื่อมโยง</button>
     <div id="analysis-result" style="margin-top:16px;">
       <p class="empty-hint">ยังไม่ได้วิเคราะห์ ลองกดปุ่มด้านบนหลังบันทึกประวัติหลายๆ งวดแล้ว</p>
@@ -585,56 +585,87 @@ function renderConnectionNumbers(prevLast2, draw) {
 }
 
 function getSortedHistoryWithDate() {
-  return history.filter(h => h.date && h.last2).slice().sort((a, b) => a.date.localeCompare(b.date));
+  return history.filter(h => h.date).slice().sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function buildFormulas() {
-  return [
-    {
-      id: 'dateunits',
-      label: 'วันที่งวดถัดไป + หลักหน่วยเลขท้ายงวดก่อน',
-      baseline: 0.01,
+  const birthDateVal = document.getElementById('birth-date-input').value;
+  const formulas = [];
+
+  if (birthDateVal) {
+    const birth = parseDateParts(birthDateVal);
+    formulas.push({
+      id: 'mainFirst3',
+      label: 'สูตรหลัก: รางวัลที่ 1 (วันเกิด+วันงวด+ราศี) ทายตรงหรือกลับหลัก',
+      target: 'first3',
+      baseline: 0.002,
       predict: (prev, next) => {
         const d = parseDateParts(next.date);
+        if (!d) return [];
+        const zodiac = ZODIAC_BY_MONTH[d.month];
+        const birthSum = birth.day + birth.month + birth.yearBE2;
+        const p = pad3(birthSum + d.day + d.month + zodiac.lucky);
+        return [p, reverse3(p)];
+      }
+    });
+  }
+
+  formulas.push(
+    {
+      id: 'mainLast2',
+      label: 'สูตรหลัก: เลขท้าย 2 ตัว (วันงวด+หลักหน่วยงวดก่อน) ทายตรงหรือกลับหลัก',
+      target: 'last2',
+      baseline: 0.02,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2) return [];
         const u = parseInt(prev.last2.slice(-1), 10);
-        return pad2(d.day + d.month + d.yearBE2 + u);
+        const p = pad2(d.day + d.month + d.yearBE2 + u);
+        return [p, reverse2(p)];
       }
     },
     {
       id: 'repeat',
       label: 'เลขท้ายงวดก่อนออกซ้ำในงวดถัดไป',
+      target: 'last2',
       baseline: 0.01,
-      predict: (prev) => prev.last2
+      predict: (prev) => (prev.last2 ? [prev.last2] : [])
     },
     {
       id: 'reverse',
       label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป',
+      target: 'last2',
       baseline: 0.01,
-      predict: (prev) => reverse2(prev.last2)
+      predict: (prev) => (prev.last2 ? [reverse2(prev.last2)] : [])
     },
     {
       id: 'sumdate',
       label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป',
+      target: 'last2',
       baseline: 0.01,
       predict: (prev, next) => {
         const d = parseDateParts(next.date);
-        return pad2(parseInt(prev.last2, 10) + d.day + d.month);
+        if (!d || !prev.last2) return [];
+        return [pad2(parseInt(prev.last2, 10) + d.day + d.month)];
       }
     },
     {
-      id: 'firstprize',
+      id: 'firstprize2',
       label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน',
+      target: 'last2',
       baseline: 0.01,
-      predict: (prev) => (prev.first ? prev.first.slice(-2) : null)
+      predict: (prev) => (prev.first ? [prev.first.slice(-2)] : [])
     },
     {
       id: 'unitsonly',
       label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป',
+      target: 'last2unit',
       baseline: 0.1,
-      predict: (prev) => null,
-      predictUnit: (prev) => prev.last2.slice(-1)
+      predict: (prev) => (prev.last2 ? [prev.last2.slice(-1)] : [])
     }
-  ];
+  );
+
+  return formulas;
 }
 
 function runFormula(f, sorted) {
@@ -642,17 +673,18 @@ function runFormula(f, sorted) {
   const matchedPairs = [];
   for (let i = 0; i < sorted.length - 1; i++) {
     const prev = sorted[i], next = sorted[i + 1];
-    if (f.predictUnit) {
-      const predU = f.predictUnit(prev);
-      if (predU == null) continue;
-      total++;
-      if (predU === next.last2.slice(-1)) { hits++; matchedPairs.push(`${prev.date} → ${next.date}`); }
-    } else {
-      const pred = f.predict(prev, next);
-      if (pred == null) continue;
-      total++;
-      if (pred === next.last2) { hits++; matchedPairs.push(`${prev.date} → ${next.date}`); }
-    }
+
+    let actual = null;
+    if (f.target === 'last2') actual = next.last2 || null;
+    else if (f.target === 'last2unit') actual = next.last2 ? next.last2.slice(-1) : null;
+    else if (f.target === 'first3') actual = next.first ? next.first.slice(-3) : null;
+    if (!actual) continue;
+
+    const preds = f.predict(prev, next) || [];
+    if (preds.length === 0) continue;
+
+    total++;
+    if (preds.includes(actual)) { hits++; matchedPairs.push(`${prev.date} → ${next.date}`); }
   }
   return { ...f, hits, total, rate: total > 0 ? hits / total : 0, matchedPairs };
 }
@@ -749,9 +781,13 @@ function analyzeConnections() {
   const resultEl = document.getElementById('analysis-result');
 
   if (sorted.length < 3) {
-    resultEl.innerHTML = '<p class="empty-hint">ต้องมีประวัติอย่างน้อย 3 งวดขึ้นไป (ที่มีทั้งวันที่และเลขท้าย 2 ตัวครบ) ถึงจะวิเคราะห์ความเชื่อมโยงได้อย่างมีความหมาย</p>';
+    resultEl.innerHTML = '<p class="empty-hint">ต้องมีประวัติอย่างน้อย 3 งวดขึ้นไป (ที่มีวันที่ครบ) ถึงจะวิเคราะห์ความเชื่อมโยงได้อย่างมีความหมาย</p>';
     return;
   }
+
+  const birthNote = document.getElementById('birth-date-input').value
+    ? ''
+    : '<p class="analysis-meta" style="color:var(--maroon);">ยังไม่ได้กรอกวันเกิดในการ์ดคำนวณเลขเด่นด้านบน จึงยังทดสอบสูตรหลักรางวัลที่ 1 ให้ไม่ได้ กรอกวันเกิดก่อนแล้วกดวิเคราะห์ใหม่เพื่อรวมสูตรนี้ด้วย</p>';
 
   const formulas = buildFormulas();
   const results = formulas.map(f => runFormula(f, sorted)).sort((a, b) => b.rate - a.rate);
@@ -778,14 +814,15 @@ function analyzeConnections() {
   }).join('');
 
   resultEl.innerHTML = `
-    <p class="analysis-meta">วิเคราะห์จาก ${sorted.length} งวด (${pairCount} คู่ต่อเนื่อง) เรียงตามวันที่ตั้งแต่ ${sorted[0].date} ถึง ${sorted[sorted.length - 1].date}</p>
+    ${birthNote}
+    <p class="analysis-meta">วิเคราะห์จาก ${sorted.length} งวด (${pairCount} คู่ต่อเนื่อง) เรียงตามวันที่ตั้งแต่ ${sorted[0].date} ถึง ${sorted[sorted.length - 1].date} — รวมทั้งสูตรหลัก (คำนวณจากวันเกิด/วันงวด) และสมมติฐานความเชื่อมโยงทั้ง 4 แบบ</p>
     <table class="analysis">
-      <thead><tr><th>สมมติฐานความเชื่อมโยง</th><th>ทายถูก/ทั้งหมด</th><th>อัตราถูกจริง</th><th>โอกาสสุ่มล้วนๆ</th><th>ข้อสรุป</th></tr></thead>
+      <thead><tr><th>สูตร / สมมติฐาน</th><th>ทายถูก/ทั้งหมด</th><th>อัตราถูกจริง</th><th>โอกาสสุ่มล้วนๆ</th><th>ข้อสรุป</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="analysis-caveat">
-      <b style="color:var(--maroon-dark)">อ่านผลลัพธ์อย่างไร:</b> "โอกาสสุ่มล้วนๆ" คือค่าที่ควรทายถูกโดยเฉลี่ยหากเลขออกแบบสุ่มจริง (ไม่มีความเชื่อมโยงใดๆ) ถ้าอัตราที่ทายถูกจริงไม่ต่างจากค่านี้มาก แปลว่าสมมติฐานนั้นไม่ได้อธิบายอะไรมากไปกว่าเดา
-      กับข้อมูลจำนวนน้อย (สลากออกปีละ ~24 งวด) การเจอสูตรที่ดูเหมือนถูกบ่อยเป็นเรื่องปกติที่เกิดจากการทดสอบหลายสมมติฐานพร้อมกัน (ยิ่งทดสอบหลายสูตร ยิ่งมีโอกาสเจอสูตรที่ "ดูเหมือน" ถูกโดยบังเอิญ) ไม่ได้แปลว่าค้นพบความเชื่อมโยงที่แท้จริงระหว่างงวด เพราะการออกรางวัลแต่ละงวดเป็นการสุ่มที่เป็นอิสระต่อกันทางสถิติ
+      <b style="color:var(--maroon-dark)">อ่านผลลัพธ์อย่างไร:</b> "โอกาสสุ่มล้วนๆ" คือค่าที่ควรทายถูกโดยเฉลี่ยหากเลขออกแบบสุ่มจริง (ไม่มีความเชื่อมโยงใดๆ) ถ้าอัตราที่ทายถูกจริงไม่ต่างจากค่านี้มาก แปลว่าสูตรนั้นไม่ได้อธิบายอะไรมากไปกว่าเดา
+      ด้วยข้อมูล ${pairCount} คู่งวด ถือว่ามีตัวอย่างมากพอสมควร ถ้าอัตราถูกจริงยังใกล้เคียงโอกาสสุ่มอยู่ ก็เป็นสัญญาณที่ค่อนข้างน่าเชื่อถือว่าสูตรนั้นไม่ได้มีผลจริง เพราะการออกรางวัลแต่ละงวดเป็นการสุ่มที่เป็นอิสระต่อกันทางสถิติ แต่ก็ยังต้องระวังการทดสอบหลายสมมติฐานพร้อมกัน (ยิ่งทดสอบหลายสูตร ยิ่งมีโอกาสเจอสูตรใดสูตรหนึ่งที่ดูเหมือนถูกบ่อยกว่าปกติโดยบังเอิญ)
     </div>
   `;
 }
