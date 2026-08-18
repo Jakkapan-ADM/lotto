@@ -88,6 +88,23 @@
   }
   .swap-note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
 
+  .connection-block {
+    margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line);
+  }
+  .connection-title { text-align: center; font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+  .connection-list { display: flex; flex-direction: column; gap: 8px; }
+  .connection-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--paper); border-radius: 8px; padding: 8px 12px;
+  }
+  .connection-row .label { font-size: 12.5px; color: var(--ink-soft); flex: 1; }
+  .connection-row .value {
+    font-family: 'Noto Serif Thai', serif; font-weight: 700; font-size: 17px;
+    color: var(--maroon-dark); white-space: nowrap;
+  }
+  .connection-row .value.na { font-family: 'Noto Sans Thai', sans-serif; font-weight: 400; font-size: 11.5px; color: var(--ink-soft); }
+  .connection-caption { font-size: 11px; color: var(--ink-soft); text-align: center; margin-top: 10px; line-height: 1.5; }
+
   .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
   button {
     font-family: 'Noto Sans Thai', sans-serif; font-size: 14px; font-weight: 500;
@@ -191,6 +208,12 @@
     </div>
 
     <div class="swap-note" id="swap-note"></div>
+
+    <div class="connection-block" id="connection-block" style="display:none;">
+      <div class="connection-title">เลขจากความเชื่อมโยงระหว่างงวด</div>
+      <div class="connection-list" id="connection-list"></div>
+      <div class="connection-caption">คำนวณจากเลขท้ายงวดก่อนหน้าและวันที่งวดนี้ เป็นสมมติฐานทางเลือกเพิ่มเติม ไม่ใช่สูตรหลัก — ดูอัตราทายถูกจริงเทียบกับโอกาสสุ่มได้ที่การ์ด "วิศวกรรมย้อนกลับ" ด้านล่าง</div>
+    </div>
 
     <div class="btn-row">
       <button id="calc-btn">คำนวณเลขเด่น</button>
@@ -499,6 +522,45 @@ function calculate() {
   document.getElementById('swap-note').textContent = dup
     ? 'พบเลขซ้ำกับประวัติที่บันทึกไว้ ตามเคล็ดให้ลองกลับคู่ตัวเลขไว้เป็นชุดสำรองด้วย'
     : '';
+
+  renderConnectionNumbers(prevLast2, draw);
+}
+
+function renderConnectionNumbers(prevLast2, draw) {
+  const block = document.getElementById('connection-block');
+  const list = document.getElementById('connection-list');
+  const mostRecent = history[0] || null;
+  const prevFirst = mostRecent && mostRecent.first ? mostRecent.first : null;
+
+  const rows = [];
+
+  // 1. หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป
+  const unitsDigit = prevLast2.slice(-1);
+  rows.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: `ลงท้าย ${unitsDigit}` });
+
+  // 2. สองหลักท้ายรางวัลที่ 1 ของงวดก่อน
+  if (prevFirst) {
+    rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: prevFirst.slice(-2) });
+  } else {
+    rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
+  }
+
+  // 3. เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป
+  const sumdate = pad2(parseInt(prevLast2, 10) + draw.day + draw.month);
+  rows.push({ label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป', value: sumdate });
+
+  // 4. เลขท้ายงวดก่อนกลับหลักในงวดถัดไป
+  const reversedPrev = reverse2(prevLast2);
+  rows.push({ label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป', value: reversedPrev });
+
+  list.innerHTML = rows.map(r => `
+    <div class="connection-row">
+      <span class="label">${r.label}</span>
+      <span class="value${r.na ? ' na' : ''}">${r.value}</span>
+    </div>
+  `).join('');
+
+  block.style.display = 'block';
 }
 
 function getSortedHistoryWithDate() {
