@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สูตรเลขเด็ด - คำนวณตามวันเกิดและวันงวด</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAE8UlEQVR4nL2X34tVVRTHP2vvfX+M6cxUls2gjb8ZiPyRkQSBFAZRQkGM5EtFgQ+9CEZ/RQT5Uk9Bj9IQqGj0IEEgQiKlE2G/TK/ODx0zx2nGO/fes9fq4dx7556Zq5Uzujnr4Zyz915rfdda3722AAww4AcZjO+v3tpXdLLPxHaZWR+QA4SFDQNqIlISk6Mzagc+uvhDqaFTmsr7Nr1RDP6AF3k0MUPNsAVqbgwBnAhBhGg2PpPEfR+Vhg4OMOAF4IM1WwY6nPuiako0jSBOFu55Zlj6qBfn8+Ioq+7+8MKZQdm/7olVXv2QE+mKZgr4xVTcZkQv4tTsZnRxUyDK/uBcd0VjFOReKwfwNdNYcL47Rt0fDF6rmZqBW7yo/+twdZ2vBTVWmumixvs/DEnSJF8ZDEI7v0VSsQWC0tjjNvuEYO3+CNQqRoyG3AGbxlq5wyQz8F4IeaFdhIPO+SoCtarRsy7PhqeX4r2k1rfqqC/J5x0A1ao2DW+dIwIxGr+dnmLsfJVcXuYhETIf6p4vfzzw0rs9FDtyWLTMxmYQfMoSw6O3EGBj7wOotUHMQLywbvMyjnw6wp+XknlIZBBwArVEWdnfQbEYuDWZ4Jw0XTbAOeHvSuSTz36mZ0UHUY0/r1d4751+8jmHmrXYK6gaS5YFVvZ3MPbHTULBoS0GODNjVtK4ei9NRMSlvCgu/VYsei4NT3Py9Dg7d/Ty/HM9nDh1lZGxaQrFlEYa88XNhiUN5ayOhgTNhgQTmJ5MMIWQEzTShNU5YWYm0r+hixee6+HY8WFiNF7c0cv6tZ1UKrGOWEu4coJpfU8BJZW2CMSohCIMnZzk4MclylMRH7Ib5nKO0Su3GLtaZuPaTjas7WRk7BZXx8vkgsskmQ9CeSpy8OMSQycnCUWIUTMIOMVoFTMIwVH6ZZqzJyYIOUgSRTU1MBeEMz9e5/cLk2zftpxntj7Mr+cnOfvTX4ScEGM6N0mUkBPOnpig9Ms0oW7cXH2ZKphXzpYmgshsPlQqkW2bl3Pi1DhffzNCEo2N6zrZ8uRDzRA097kNPWR0vtW7ofnaOLdVjUd6i7zydi8PdAY0WmZxPu8olxMuXp5GBFavWkqx4KnWNOOE88L0ZMKxz0e5NjqDczKvz5A3e9bPGuCESjny1I5udr7em0If5yNjBs5BIZ9mfaUaUb3NPJ+G9PiXo3z/7QSFDo+11GGmChyQqLGky+O9MFNuKclWq+v8Xp5J6u/SlrJFIKkZhYKwpMuTqJEnWwWZs6BRozGpE48Zpm0pfI6n7WdIy7+YWCb7WxDIGuCCcP7cFM/urLG0M4+q3XVv1mDOykyV8+emcEGIZrRmgbyxYm3GfBGoVpTV/R1s2t6N83Xu/r9W1NdoNIa+m+Diz2XyhSxPAMjuFWvm4ZcaYWjUOgXfbVMgmBrOO/KF+SchzMmBpvEGuYKwmP2pansngmIJSJi/4n70h5YEVRv2Tvpieozel97QwLwIUW3YmXBIQBTTuTx9D0UFxIRD8uqDvavM+yEvrium7fE9vRtY/WISTW9KjJvc4RujlxHZKymh+YhFxeweeG0RiyKkDZ3I3sM3Ri+7AfBHrl0arCRxj6mNh/R2JHM7l4UJABIQb2rjlSTuOXLt0uAApEQ/AH4Q4svdj/V5H/YZ7FJY1Ou5g5LA0RiTA19NXCk1dP4Dr7JYJckbidwAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7A2331">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="เลขเด่น">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;700&family=Noto+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --paper: #FBF6EA;
+    --card: #FFFFFF;
+    --ink: #3A2A1D;
+    --ink-soft: #6B5C4D;
+    --maroon: #7A2331;
+    --maroon-dark: #5A1A24;
+    --gold: #B8862E;
+    --pink-deep: #C9788C;
+    --line: #D9CDB6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans Thai', sans-serif;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 28px 20px 60px; }
+  h1, h2 { font-family: 'Noto Serif Thai', serif; font-weight: 700; margin: 0; color: var(--maroon-dark); }
+  header.hero { text-align: center; margin-bottom: 28px; }
+  header.hero h1 { font-size: 26px; }
+  header.hero p.eyebrow {
+    font-size: 13px; letter-spacing: 1px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 6px; font-weight: 500;
+  }
+
+  .ticket {
+    position: relative;
+    background: var(--card);
+    border: 1.5px dashed var(--pink-deep);
+    border-radius: 14px;
+    padding: 26px 22px;
+    margin-bottom: 26px;
+    overflow: hidden;
+  }
+  .ticket::before, .ticket::after {
+    content: ""; position: absolute; width: 26px; height: 26px;
+    background: var(--paper); border: 1.5px dashed var(--pink-deep);
+    border-radius: 50%; top: 50%; transform: translateY(-50%);
+  }
+  .ticket::before { left: -13px; }
+  .ticket::after { right: -13px; }
+  .ticket-top {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--ink-soft); margin-bottom: 14px;
+    border-bottom: 1px solid var(--line); padding-bottom: 10px;
+  }
+  .ticket-top span.tag {
+    background: var(--maroon); color: #F6E6D8; padding: 3px 10px;
+    border-radius: 20px; font-size: 11px; font-weight: 500;
+  }
+  .prize-block { text-align: center; margin: 16px 0; }
+  .prize-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+  .digits { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .digit {
+    width: 46px; height: 58px; background: var(--paper); border: 1.5px solid var(--gold);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Noto Serif Thai', serif; font-size: 28px; font-weight: 700; color: var(--maroon-dark);
+  }
+  .digits.pulse .digit { animation: flip 0.4s ease; }
+  @keyframes flip { 0% { transform: rotateX(90deg); opacity: 0.3; } 100% { transform: rotateX(0deg); opacity: 1; } }
+
+  .chip-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip {
+    background: var(--paper); border: 1px solid var(--gold); border-radius: 20px;
+    padding: 5px 14px; font-family: 'Noto Serif Thai', serif; font-weight: 700;
+    font-size: 15px; color: var(--maroon-dark);
+  }
+  .swap-note { text-align: center; font-size: 12px; color: var(--ink-soft); margin-top: 10px; }
+
+  .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+  button {
+    font-family: 'Noto Sans Thai', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--maroon);
+    background: var(--maroon); color: #FBF6EA; cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.15s ease;
+  }
+  button:active { transform: scale(0.97); }
+  button.secondary { background: transparent; color: var(--maroon); border-color: var(--maroon); }
+  button.ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); font-size: 12px; padding: 6px 12px; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px; }
+  .card h2 { font-size: 17px; margin-bottom: 4px; }
+  .card .sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 14px; }
+
+  .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .field { flex: 1; min-width: 130px; }
+  .field label { display: block; font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  input[type=text], input[type=date] {
+    width: 100%; padding: 9px 10px; font-size: 15px; border: 1px solid var(--line);
+    border-radius: 8px; background: #FEFCF6; color: var(--ink); font-family: 'Noto Sans Thai', sans-serif;
+  }
+  input:focus { outline: none; border-color: var(--gold); }
+  .error-msg { color: var(--maroon); font-size: 12px; min-height: 16px; margin-top: -4px; margin-bottom: 8px; }
+
+  table.history { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.history th {
+    text-align: left; font-weight: 500; color: var(--ink-soft);
+    border-bottom: 1px solid var(--line); padding: 6px 4px; font-size: 12px;
+  }
+  table.history td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+  table.history td.num { font-family: 'Noto Serif Thai', serif; font-weight: 700; letter-spacing: 1px; }
+  .empty-hint { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 20px 0; }
+
+  details.formula summary { cursor: pointer; font-weight: 500; color: var(--maroon); font-size: 14px; list-style: none; }
+  details.formula summary::-webkit-details-marker { display: none; }
+  details.formula summary::before { content: "▸ "; }
+  details.formula[open] summary::before { content: "▾ "; }
+  details.formula p, details.formula li { font-size: 13.5px; color: var(--ink-soft); }
+  details.formula ol, details.formula ul { padding-left: 20px; }
+  details.formula { margin-top: 4px; }
+
+  table.analysis { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.analysis th {
+    text-align: left; font-weight: 500; color: var(--ink-soft);
+    border-bottom: 1px solid var(--line); padding: 6px 4px; font-size: 11.5px;
+  }
+  table.analysis td { padding: 8px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .verdict {
+    display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 9px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .verdict.notable { background: #E4EFE0; color: #2F6B3E; }
+  .verdict.chance { background: #EFE7DC; color: var(--ink-soft); }
+  .analysis-meta { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 12px; }
+  .analysis-caveat {
+    background: var(--paper); border-radius: 8px; padding: 12px 14px; margin-top: 14px;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .match-list { font-size: 11.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  .disclaimer {
+    background: #F3E7D9; border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0;
+    padding: 14px 16px; font-size: 13px; color: var(--ink-soft); margin-top: 24px;
+  }
+  .disclaimer b { color: var(--maroon-dark); }
+
+  @media (max-width: 480px) {
+    .digit { width: 38px; height: 50px; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">คำนวณเลขเด่นจากวันงวดและวันเกิด</p>
+    <h1>สูตรเลขเด็ด</h1>
+  </header>
+
+  <div class="ticket">
+    <div class="ticket-top">
+      <span>สลากกินแบ่งรัฐบาล</span>
+      <span class="tag" id="basis-tag">รอกรอกข้อมูล</span>
+    </div>
+
+    <div class="prize-block">
+      <div class="prize-label">เลขเด่นรางวัลที่ 1 (แนวทางหลักร้อย-หลักพัน)</div>
+      <div class="digits" id="first-digits">
+        <div class="digit">-</div><div class="digit">-</div><div class="digit">-</div>
+      </div>
+      <div class="chip-row" id="first-combo-row"></div>
+    </div>
+
+    <div class="prize-block">
+      <div class="prize-label">เลขเด่นเลขท้าย 2 ตัว</div>
+      <div class="digits" id="last2-digits">
+        <div class="digit">-</div><div class="digit">-</div>
+      </div>
+      <div class="chip-row" id="last2-combo-row"></div>
+    </div>
+
+    <div class="swap-note" id="swap-note"></div>
+
+    <div class="btn-row">
+      <button id="calc-btn">คำนวณเลขเด่น</button>
+      <button class="secondary" id="explain-btn">สูตรคำนวณคืออะไร</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>ข้อมูลสำหรับคำนวณ</h2>
+    <p class="sub">ใช้วันที่ออกสลากงวดนี้ และวันเกิดของคุณ ตามสูตรที่กำหนด</p>
+    <div class="form-row">
+      <div class="field">
+        <label for="draw-date-input">วันที่ออกสลากงวดนี้</label>
+        <input type="date" id="draw-date-input">
+      </div>
+      <div class="field">
+        <label for="prev-last2-input">เลขท้าย 2 ตัวงวดก่อนหน้า</label>
+        <input type="text" id="prev-last2-input" placeholder="เช่น 76" maxlength="2" inputmode="numeric">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field">
+        <label for="birth-date-input">วันเกิดของคุณ</label>
+        <input type="date" id="birth-date-input">
+      </div>
+    </div>
+    <div class="error-msg" id="form-error"></div>
+  </div>
+
+  <div class="card">
+    <h2>ดึงข้อมูลย้อนหลังอัตโนมัติ</h2>
+    <p class="sub">ดึงผลรางวัลจริงย้อนหลังจาก API สาธารณะ (<code>lotto.api.rayriffy.com</code> ซึ่งรวบรวมจาก sanook.com ไม่ใช่เว็บทางการของ กสท. โดยตรง) เข้ามาเก็บให้อัตโนมัติ ไม่ต้องพิมพ์หรือวางเอง — ถ้าดึงไม่สำเร็จเพราะข้อจำกัดเครือข่ายของหน้านี้ ให้ใช้วิธีวางข้อมูลด้านล่างแทน</p>
+    <div class="form-row">
+      <div class="field">
+        <label for="years-back-select">ย้อนหลังกี่ปี</label>
+        <select id="years-back-select" style="width:100%; padding:9px 10px; font-size:15px; border:1px solid var(--line); border-radius:8px; background:#FEFCF6; color:var(--ink); font-family:'Noto Sans Thai',sans-serif;">
+          <option value="1">1 ปี</option>
+          <option value="3">3 ปี</option>
+          <option value="5">5 ปี</option>
+          <option value="10" selected>10 ปี</option>
+        </select>
+      </div>
+    </div>
+    <button id="fetch-api-btn">ดึงข้อมูลอัตโนมัติ</button>
+    <p class="sub" id="fetch-progress" style="margin-top:10px;"></p>
+  </div>
+
+  <div class="card">
+    <h2>วางข้อมูลทีเดียวหลายงวด</h2>
+    <p class="sub">คัดลอกผลรางวัลจากแหล่งทางการ (เช่น เว็บไซต์สำนักงานสลากกินแบ่งรัฐบาล glo.or.th) แล้ววางที่นี่ 1 บรรทัดต่อ 1 งวด รูปแบบ: <b>วว/ดด/ปปปป, รางวัลที่1(6หลัก), เลขท้าย2ตัว</b> เช่น <code>16/01/2569,123456,78</code> — ใส่ไม่ครบทุกช่องก็ได้ ระบบจะข้ามบรรทัดที่อ่านไม่ออกให้อัตโนมัติ</p>
+    <textarea id="bulk-input" rows="6" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font-family:'Noto Sans Thai',sans-serif; font-size:14px; background:#FEFCF6; color:var(--ink);" placeholder="16/01/2569,123456,78&#10;01/01/2569,654321,90&#10;16/12/2568,,45"></textarea>
+    <div class="error-msg" id="bulk-error"></div>
+    <div style="margin-top:8px;">
+      <button id="bulk-add-btn">นำเข้าทั้งหมด</button>
+      <button class="ghost" id="bulk-clear-btn">ล้างข้อความ</button>
+    </div>
+    <p class="sub" id="bulk-result" style="margin-top:10px;"></p>
+  </div>
+
+  <div class="card">
+    <h2>เพิ่มผลรางวัลงวดก่อนหน้า</h2>
+    <p class="sub">ข้อมูลจะถูกจำไว้ในเบราว์เซอร์นี้อัตโนมัติ (ไม่ต้องกรอกซ้ำทุกครั้งที่เปิด) และกด "ส่งออกเป็น Excel" เพื่อเก็บสำเนาไว้เปิดดูเอง หรือ "นำเข้าจาก Excel" เพื่อโหลดไฟล์เก่ากลับเข้ามาบนเครื่อง/เบราว์เซอร์อื่น</p>
+    <div class="form-row">
+      <div class="field">
+        <label for="hist-date-input">งวดวันที่</label>
+        <input type="date" id="hist-date-input">
+      </div>
+      <div class="field">
+        <label for="hist-first-input">รางวัลที่ 1 (6 หลัก)</label>
+        <input type="text" id="hist-first-input" placeholder="เช่น 123456" maxlength="6" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="hist-last2-input">เลขท้าย 2 ตัว</label>
+        <input type="text" id="hist-last2-input" placeholder="เช่น 76" maxlength="2" inputmode="numeric">
+      </div>
+    </div>
+    <div class="error-msg" id="hist-error"></div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button id="add-btn">เพิ่มข้อมูล</button>
+      <button class="secondary" id="export-excel-btn">ส่งออกเป็น Excel</button>
+      <button class="secondary" id="import-excel-btn">นำเข้าจาก Excel</button>
+      <input type="file" id="import-excel-file" accept=".xlsx,.xls,.csv" style="display:none;">
+    </div>
+    <p class="sub" id="history-count" style="margin-top:14px;">ยังไม่มีข้อมูล</p>
+    <div id="history-table-wrap">
+      <p class="empty-hint">ยังไม่มีประวัติ ลองเพิ่มผลรางวัลงวดก่อนหน้าด้านบน</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>วิศวกรรมย้อนกลับ: หาความเชื่อมโยงระหว่างงวด</h2>
+    <p class="sub">ทดสอบสมมติฐานหลายแบบกับประวัติที่บันทึกไว้ (เรียงตามวันที่) ว่างวดหนึ่งเชื่อมโยงกับงวดถัดไปด้วยวิธีใดบ้าง แล้วคำนวณอัตราที่ทายถูกจริงเทียบกับโอกาสสุ่มล้วนๆ</p>
+    <button id="analyze-btn">วิเคราะห์ความเชื่อมโยง</button>
+    <div id="analysis-result" style="margin-top:16px;">
+      <p class="empty-hint">ยังไม่ได้วิเคราะห์ ลองกดปุ่มด้านบนหลังบันทึกประวัติหลายๆ งวดแล้ว</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <details class="formula" id="formula-details">
+      <summary>สูตรที่ใช้คำนวณ (คลิกเพื่อดูรายละเอียด)</summary>
+      <p><b style="color:var(--maroon-dark)">เลขท้าย 2 ตัว</b></p>
+      <ol>
+        <li>นำวัน + เดือน + สองหลักท้ายของปี พ.ศ. ของวันที่ออกสลากงวดนี้มาบวกกัน</li>
+        <li>นำผลรวมนั้นบวกกับหลักหน่วยของเลขท้าย 2 ตัวงวดก่อนหน้า</li>
+        <li>หากผลลัพธ์เกิน 99 ให้ลบด้วย 100 จนเหลือ 2 หลัก</li>
+        <li>ได้เลขเด่น และเลขชุดแนะนำคือเลขเด่นกับเลขที่กลับหลักกัน</li>
+      </ol>
+      <p><b style="color:var(--maroon-dark)">รางวัลที่ 1 (แนวทางหลักร้อย-หลักพัน)</b></p>
+      <ol>
+        <li>นำวันเกิด + เดือนเกิด + สองหลักท้ายปีเกิด (พ.ศ.) ของคุณมาบวกกัน</li>
+        <li>บวกด้วยวันที่และเดือนของวันออกสลากงวดนี้</li>
+        <li>บวกด้วยเลขนำโชคประจำราศีของเดือนที่ออกสลาก (แต่ละเดือนมีราศีและเลขนำโชคประจำตัวตามความเชื่อ)</li>
+        <li>หากผลลัพธ์เกิน 999 ให้ลบด้วย 1000 จนเหลือ 3 หลัก ได้เป็นเลขเด่น</li>
+        <li>เลขชุดแนะนำคือเลขเด่นกับเลข 3 หลักที่กลับหลักกัน</li>
+      </ol>
+      <p>หากเลขเด่นที่คำนวณได้ซ้ำหรือวนกับเลขที่เคยออกในประวัติ ระบบจะแนะนำให้กลับคู่ตัวเลขเป็นชุดสำรอง</p>
+      <p>ทั้งหมดนี้เป็นสูตรตามความเชื่อและวิธีคิดเลขแบบดั้งเดิม ไม่ใช่การคำนวณทางคณิตศาสตร์ที่มีผลต่อความน่าจะเป็นจริง</p>
+    </details>
+  </div>
+
+  <div class="disclaimer">
+    <b>ข้อควรทราบ:</b> การออกรางวัลสลากกินแบ่งรัฐบาลใช้การสุ่มลูกบอลจริง แต่ละงวดเป็นเหตุการณ์อิสระทางสถิติ ผลรางวัลของงวดก่อนหน้าและวันเกิดของคุณไม่มีผลต่อความน่าจะเป็นของตัวเลขที่จะออกในงวดถัดไปแต่อย่างใด (แต่ละหลักมีโอกาสออก 1 ใน 10 เท่ากันเสมอ) สูตรนี้เป็นวิธีคิดเลขตามความเชื่อดั้งเดิม จัดทำขึ้นเพื่อความบันเทิงเท่านั้น ไม่ควรใช้เป็นหลักในการตัดสินใจทางการเงิน
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'lottery-history-th';
+const BIRTHDATE_KEY = 'lottery-birthdate-th';
+let history = [];
+
+const ZODIAC_BY_MONTH = {
+  1: { name: 'มังกร', lucky: 3 },
+  2: { name: 'กุมภ์', lucky: 4 },
+  3: { name: 'มีน', lucky: 7 },
+  4: { name: 'เมษ', lucky: 9 },
+  5: { name: 'พฤษภ', lucky: 6 },
+  6: { name: 'เมถุน', lucky: 5 },
+  7: { name: 'กรกฎ', lucky: 2 },
+  8: { name: 'สิงห์', lucky: 1 },
+  9: { name: 'กันย์', lucky: 4 },
+  10: { name: 'ตุล', lucky: 6 },
+  11: { name: 'พิจิก', lucky: 8 },
+  12: { name: 'ธนู', lucky: 3 }
+};
+const PREFIXES = [5, 8, 0, 1];
+
+function pad2(n) { return String(((n % 100) + 100) % 100).padStart(2, '0'); }
+function pad3(n) { return String(((n % 1000) + 1000) % 1000).padStart(3, '0'); }
+function be2(gregorianYear) { return (gregorianYear + 543) % 100; }
+function reverse2(str) { return str.split('').reverse().join(''); }
+function reverse3(str) { return str.split('').reverse().join(''); }
+
+function parseDateParts(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return { day: d, month: m, yearBE2: be2(y) };
+}
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) history = JSON.parse(raw);
+  } catch (e) { history = []; }
+  try {
+    const b = localStorage.getItem(BIRTHDATE_KEY);
+    if (b) document.getElementById('birth-date-input').value = b;
+  } catch (e) {}
+  autofillPrevLast2();
+  renderAll();
+}
+
+function saveHistory() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); }
+  catch (e) { console.error('บันทึกข้อมูลไม่สำเร็จ', e); }
+}
+
+function saveBirthdate(val) {
+  try { localStorage.setItem(BIRTHDATE_KEY, val); }
+  catch (e) {}
+}
+
+function autofillPrevLast2() {
+  if (history.length > 0 && history[0].last2) {
+    document.getElementById('prev-last2-input').value = history[0].last2;
+  }
+}
+
+document.getElementById('birth-date-input').addEventListener('change', (e) => {
+  saveBirthdate(e.target.value);
+});
+
+function validateFirst(v) { return /^\d{6}$/.test(v); }
+function validateLast2(v) { return /^\d{2}$/.test(v); }
+
+document.getElementById('add-btn').addEventListener('click', async () => {
+  const dateVal = document.getElementById('hist-date-input').value;
+  const firstVal = document.getElementById('hist-first-input').value.trim();
+  const last2Val = document.getElementById('hist-last2-input').value.trim();
+  const errEl = document.getElementById('hist-error');
+
+  if (!validateFirst(firstVal) && !validateLast2(last2Val)) {
+    errEl.textContent = 'กรุณากรอกรางวัลที่ 1 (6 หลัก) หรือเลขท้าย 2 ตัว (2 หลัก) อย่างน้อยหนึ่งอย่าง';
+    return;
+  }
+  if (firstVal && !validateFirst(firstVal)) { errEl.textContent = 'รางวัลที่ 1 ต้องเป็นตัวเลข 6 หลัก'; return; }
+  if (last2Val && !validateLast2(last2Val)) { errEl.textContent = 'เลขท้าย 2 ตัวต้องเป็นตัวเลข 2 หลัก'; return; }
+  errEl.textContent = '';
+
+  history.unshift({ id: Date.now().toString(36), date: dateVal || null, first: firstVal || null, last2: last2Val || null });
+
+  document.getElementById('hist-date-input').value = '';
+  document.getElementById('hist-first-input').value = '';
+  document.getElementById('hist-last2-input').value = '';
+
+  await saveHistory();
+  autofillPrevLast2();
+  renderAll();
+});
+
+async function deleteEntry(id) {
+  history = history.filter(h => h.id !== id);
+  await saveHistory();
+  renderAll();
+}
+
+function renderHistoryTable() {
+  const wrap = document.getElementById('history-table-wrap');
+  const countEl = document.getElementById('history-count');
+  countEl.textContent = history.length > 0 ? `บันทึกไว้ทั้งหมด ${history.length} งวด` : 'ยังไม่มีข้อมูล';
+
+  if (history.length === 0) {
+    wrap.innerHTML = '<p class="empty-hint">ยังไม่มีประวัติ ลองเพิ่มผลรางวัลงวดก่อนหน้าด้านบน</p>';
+    return;
+  }
+  let rows = history.map(h => `
+    <tr>
+      <td>${h.date || '-'}</td>
+      <td class="num">${h.first || '-'}</td>
+      <td class="num">${h.last2 || '-'}</td>
+      <td><button class="ghost" onclick="deleteEntry('${h.id}')">ลบ</button></td>
+    </tr>
+  `).join('');
+  wrap.innerHTML = `
+    <table class="history">
+      <thead><tr><th>วันที่</th><th>รางวัลที่ 1</th><th>เลขท้าย 2 ตัว</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function pulseEl(el) {
+  el.classList.remove('pulse');
+  void el.offsetWidth;
+  el.classList.add('pulse');
+}
+
+function calculate() {
+  const errEl = document.getElementById('form-error');
+  errEl.textContent = '';
+
+  const drawDateVal = document.getElementById('draw-date-input').value;
+  const birthDateVal = document.getElementById('birth-date-input').value;
+  const prevLast2 = document.getElementById('prev-last2-input').value.trim();
+
+  if (!drawDateVal) { errEl.textContent = 'กรุณาเลือกวันที่ออกสลากงวดนี้'; return; }
+  if (!validateLast2(prevLast2)) { errEl.textContent = 'กรุณากรอกเลขท้าย 2 ตัวงวดก่อนหน้าให้ครบ 2 หลัก'; return; }
+  if (!birthDateVal) { errEl.textContent = 'กรุณาเลือกวันเกิดของคุณ'; return; }
+
+  const draw = parseDateParts(drawDateVal);
+  const birth = parseDateParts(birthDateVal);
+  const prevUnits = parseInt(prevLast2.slice(-1), 10);
+
+  const last2Sum = draw.day + draw.month + draw.yearBE2 + prevUnits;
+  const last2Result = pad2(last2Sum);
+  const last2Reversed = reverse2(last2Result);
+
+  const birthSum = birth.day + birth.month + birth.yearBE2;
+  const zodiac = ZODIAC_BY_MONTH[draw.month];
+  const firstSum = birthSum + draw.day + draw.month + zodiac.lucky;
+  const firstResult = pad3(firstSum);
+  const firstReversed = reverse3(firstResult);
+
+  const last2Els = document.querySelectorAll('#last2-digits .digit');
+  const firstEls = document.querySelectorAll('#first-digits .digit');
+  last2Els[0].textContent = last2Result[0];
+  last2Els[1].textContent = last2Result[1];
+  firstEls[0].textContent = firstResult[0];
+  firstEls[1].textContent = firstResult[1];
+  firstEls[2].textContent = firstResult[2];
+  pulseEl(document.getElementById('last2-digits'));
+  pulseEl(document.getElementById('first-digits'));
+
+  document.getElementById('last2-combo-row').innerHTML =
+    `<span class="chip">${last2Result}</span><span class="chip">${last2Reversed}</span>`;
+  document.getElementById('first-combo-row').innerHTML =
+    `<span class="chip">${firstResult}</span><span class="chip">${firstReversed}</span>`;
+
+  document.getElementById('basis-tag').textContent =
+    `งวด ${draw.day}/${draw.month}/${draw.yearBE2} · ราศี${zodiac.name}`;
+
+  const pastLast2 = history.map(h => h.last2).filter(Boolean);
+  const pastFirst3 = history.map(h => h.first ? h.first.slice(-3) : null).filter(Boolean);
+  const dup = pastLast2.includes(last2Result) || pastFirst3.includes(firstResult);
+  document.getElementById('swap-note').textContent = dup
+    ? 'พบเลขซ้ำกับประวัติที่บันทึกไว้ ตามเคล็ดให้ลองกลับคู่ตัวเลขไว้เป็นชุดสำรองด้วย'
+    : '';
+}
+
+function getSortedHistoryWithDate() {
+  return history.filter(h => h.date && h.last2).slice().sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function buildFormulas() {
+  return [
+    {
+      id: 'dateunits',
+      label: 'วันที่งวดถัดไป + หลักหน่วยเลขท้ายงวดก่อน',
+      baseline: 0.01,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        const u = parseInt(prev.last2.slice(-1), 10);
+        return pad2(d.day + d.month + d.yearBE2 + u);
+      }
+    },
+    {
+      id: 'repeat',
+      label: 'เลขท้ายงวดก่อนออกซ้ำในงวดถัดไป',
+      baseline: 0.01,
+      predict: (prev) => prev.last2
+    },
+    {
+      id: 'reverse',
+      label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป',
+      baseline: 0.01,
+      predict: (prev) => reverse2(prev.last2)
+    },
+    {
+      id: 'sumdate',
+      label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป',
+      baseline: 0.01,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        return pad2(parseInt(prev.last2, 10) + d.day + d.month);
+      }
+    },
+    {
+      id: 'firstprize',
+      label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน',
+      baseline: 0.01,
+      predict: (prev) => (prev.first ? prev.first.slice(-2) : null)
+    },
+    {
+      id: 'unitsonly',
+      label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป',
+      baseline: 0.1,
+      predict: (prev) => null,
+      predictUnit: (prev) => prev.last2.slice(-1)
+    }
+  ];
+}
+
+function runFormula(f, sorted) {
+  let hits = 0, total = 0;
+  const matchedPairs = [];
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const prev = sorted[i], next = sorted[i + 1];
+    if (f.predictUnit) {
+      const predU = f.predictUnit(prev);
+      if (predU == null) continue;
+      total++;
+      if (predU === next.last2.slice(-1)) { hits++; matchedPairs.push(`${prev.date} → ${next.date}`); }
+    } else {
+      const pred = f.predict(prev, next);
+      if (pred == null) continue;
+      total++;
+      if (pred === next.last2) { hits++; matchedPairs.push(`${prev.date} → ${next.date}`); }
+    }
+  }
+  return { ...f, hits, total, rate: total > 0 ? hits / total : 0, matchedPairs };
+}
+
+function analyzeConnections() {
+  const sorted = getSortedHistoryWithDate();
+  const resultEl = document.getElementById('analysis-result');
+
+  if (sorted.length < 3) {
+    resultEl.innerHTML = '<p class="empty-hint">ต้องมีประวัติอย่างน้อย 3 งวดขึ้นไป (ที่มีทั้งวันที่และเลขท้าย 2 ตัวครบ) ถึงจะวิเคราะห์ความเชื่อมโยงได้อย่างมีความหมาย</p>';
+    return;
+  }
+
+  const formulas = buildFormulas();
+  const results = formulas.map(f => runFormula(f, sorted)).sort((a, b) => b.rate - a.rate);
+  const pairCount = sorted.length - 1;
+
+  const rows = results.map(r => {
+    const expected = r.total * r.baseline;
+    const notable = r.total > 0 && r.hits >= 2 && r.hits > expected * 2;
+    const verdictHtml = notable
+      ? '<span class="verdict notable">สูงกว่าค่าโดยบังเอิญ</span>'
+      : '<span class="verdict chance">ใกล้เคียงค่าโดยบังเอิญ</span>';
+    const matchNote = r.matchedPairs.length > 0
+      ? `<div class="match-list">${r.matchedPairs.slice(0, 3).join(', ')}${r.matchedPairs.length > 3 ? ` และอีก ${r.matchedPairs.length - 3} คู่` : ''}</div>`
+      : '';
+    return `
+      <tr>
+        <td>${r.label}</td>
+        <td>${r.hits}/${r.total}</td>
+        <td>${(r.rate * 100).toFixed(1)}%</td>
+        <td>${(r.baseline * 100).toFixed(0)}%</td>
+        <td>${verdictHtml}${matchNote}</td>
+      </tr>
+    `;
+  }).join('');
+
+  resultEl.innerHTML = `
+    <p class="analysis-meta">วิเคราะห์จาก ${sorted.length} งวด (${pairCount} คู่ต่อเนื่อง) เรียงตามวันที่ตั้งแต่ ${sorted[0].date} ถึง ${sorted[sorted.length - 1].date}</p>
+    <table class="analysis">
+      <thead><tr><th>สมมติฐานความเชื่อมโยง</th><th>ทายถูก/ทั้งหมด</th><th>อัตราถูกจริง</th><th>โอกาสสุ่มล้วนๆ</th><th>ข้อสรุป</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="analysis-caveat">
+      <b style="color:var(--maroon-dark)">อ่านผลลัพธ์อย่างไร:</b> "โอกาสสุ่มล้วนๆ" คือค่าที่ควรทายถูกโดยเฉลี่ยหากเลขออกแบบสุ่มจริง (ไม่มีความเชื่อมโยงใดๆ) ถ้าอัตราที่ทายถูกจริงไม่ต่างจากค่านี้มาก แปลว่าสมมติฐานนั้นไม่ได้อธิบายอะไรมากไปกว่าเดา
+      กับข้อมูลจำนวนน้อย (สลากออกปีละ ~24 งวด) การเจอสูตรที่ดูเหมือนถูกบ่อยเป็นเรื่องปกติที่เกิดจากการทดสอบหลายสมมติฐานพร้อมกัน (ยิ่งทดสอบหลายสูตร ยิ่งมีโอกาสเจอสูตรที่ "ดูเหมือน" ถูกโดยบังเอิญ) ไม่ได้แปลว่าค้นพบความเชื่อมโยงที่แท้จริงระหว่างงวด เพราะการออกรางวัลแต่ละงวดเป็นการสุ่มที่เป็นอิสระต่อกันทางสถิติ
+    </div>
+  `;
+}
+
+function parseThaiDate(str) {
+  // accepts dd/mm/yyyy (Buddhist or Gregorian year) -> returns ISO yyyy-mm-dd (Gregorian) or null
+  const m = str.trim().match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (!m) return null;
+  let [, d, mo, y] = m;
+  d = parseInt(d, 10); mo = parseInt(mo, 10); y = parseInt(y, 10);
+  if (d < 1 || d > 31 || mo < 1 || mo > 12) return null;
+  if (y > 2400) y -= 543; // Buddhist year -> Gregorian
+  return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function extractFirstPrize(resp) {
+  if (!resp || !resp.prizes) return null;
+  let entry = resp.prizes.find(p => p.id === 'prizeFirst');
+  if (!entry) entry = resp.prizes.find(p => /รางวัลที่ ?1(?!\d)/.test(p.name || ''));
+  return (entry && entry.number && entry.number[0]) ? entry.number[0] : null;
+}
+
+function extractBackTwo(resp) {
+  if (!resp || !resp.runningNumbers) return null;
+  let entry = resp.runningNumbers.find(r => /back.*two/i.test(r.id || '') || /เลขท้าย.*2\s*ตัว/.test(r.name || ''));
+  if (!entry && resp.runningNumbers.length >= 3) entry = resp.runningNumbers[2];
+  return (entry && entry.number && entry.number[0]) ? entry.number[0] : null;
+}
+
+function buildDrawDateCandidates(yearsBack) {
+  const today = new Date();
+  const startYear = today.getFullYear() - yearsBack;
+  const candidates = [];
+  for (let y = startYear; y <= today.getFullYear(); y++) {
+    for (let mo = 1; mo <= 12; mo++) {
+      [1, 16].forEach(day => {
+        const dt = new Date(y, mo - 1, day);
+        if (dt > today) return;
+        if (dt < new Date(startYear, today.getMonth(), today.getDate())) {
+          // still allow, range is approximate by full years
+        }
+        candidates.push({ day, month: mo, year: y });
+      });
+    }
+  }
+  return candidates;
+}
+
+async function fetchFromApi() {
+  const btn = document.getElementById('fetch-api-btn');
+  const progressEl = document.getElementById('fetch-progress');
+  const yearsBack = parseInt(document.getElementById('years-back-select').value, 10);
+  const candidates = buildDrawDateCandidates(yearsBack);
+  const existingDates = new Set(history.map(h => h.date).filter(Boolean));
+
+  btn.disabled = true;
+  let done = 0, added = 0, failed = 0;
+  const batchSize = 6;
+  const newEntries = [];
+
+  for (let i = 0; i < candidates.length; i += batchSize) {
+    const batch = candidates.slice(i, i + batchSize);
+    await Promise.all(batch.map(async (c) => {
+      const dateISO = `${c.year}-${String(c.month).padStart(2, '0')}-${String(c.day).padStart(2, '0')}`;
+      done++;
+      if (existingDates.has(dateISO)) return;
+      const beYear = c.year + 543;
+      const id = `${String(c.day).padStart(2, '0')}${String(c.month).padStart(2, '0')}${beYear}`;
+      try {
+        const res = await fetch(`https://lotto.api.rayriffy.com/lotto/${id}`);
+        if (!res.ok) { failed++; return; }
+        const data = await res.json();
+        if (data.status !== 'success' || !data.response) { failed++; return; }
+        const first = extractFirstPrize(data.response);
+        const last2 = extractBackTwo(data.response);
+        if (!first && !last2) { failed++; return; }
+        newEntries.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: dateISO, first: first || null, last2: last2 || null });
+        added++;
+      } catch (e) {
+        failed++;
+      }
+    }));
+    progressEl.textContent = `กำลังดึงข้อมูล... ${done}/${candidates.length} (สำเร็จ ${added}, ไม่สำเร็จ ${failed})`;
+  }
+
+  if (added === 0) {
+    progressEl.textContent = `ดึงข้อมูลอัตโนมัติไม่สำเร็จเลย (ลองไป ${done} งวด) อาจเป็นเพราะหน้านี้ถูกจำกัดการเชื่อมต่อเครือข่ายภายนอก — กรุณาใช้วิธี "วางข้อมูลทีเดียวหลายงวด" ด้านล่างแทน`;
+    btn.disabled = false;
+    return;
+  }
+
+  history = history.concat(newEntries);
+  await saveHistory();
+  autofillPrevLast2();
+  renderAll();
+  progressEl.textContent = `เสร็จสิ้น: นำเข้าสำเร็จ ${added} งวด จากทั้งหมด ${candidates.length} งวดที่ลองดึง (ไม่สำเร็จ/ไม่พบข้อมูล ${failed} งวด)`;
+  btn.disabled = false;
+}
+
+function exportToExcel() {
+  if (history.length === 0) {
+    alert('ยังไม่มีข้อมูลให้ส่งออก ลองเพิ่มหรือดึงข้อมูลก่อน');
+    return;
+  }
+  const sorted = history.slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  const rows = sorted.map(h => ({
+    'วันที่': h.date || '',
+    'รางวัลที่ 1': h.first || '',
+    'เลขท้าย 2 ตัว': h.last2 || ''
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 14 }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'ผลรางวัล');
+  const today = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `ผลสลากย้อนหลัง-${today}.xlsx`);
+}
+
+document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+
+document.getElementById('import-excel-btn').addEventListener('click', () => {
+  document.getElementById('import-excel-file').click();
+});
+
+document.getElementById('import-excel-file').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    const existingDates = new Set(history.map(h => h.date).filter(Boolean));
+    let added = 0, skipped = 0;
+
+    rows.forEach(row => {
+      const rawDate = String(row['วันที่'] || '').trim();
+      const firstVal = String(row['รางวัลที่ 1'] || '').trim();
+      const last2Val = String(row['เลขท้าย 2 ตัว'] || '').trim();
+
+      let dateISO = null;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+        dateISO = rawDate;
+      } else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(rawDate)) {
+        dateISO = parseThaiDate(rawDate);
+      }
+
+      const validFirst = validateFirst(firstVal) ? firstVal : null;
+      const validLast2 = validateLast2(last2Val) ? last2Val : null;
+      if (!validFirst && !validLast2) { skipped++; return; }
+      if (dateISO && existingDates.has(dateISO)) { skipped++; return; }
+
+      history.unshift({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        date: dateISO, first: validFirst, last2: validLast2
+      });
+      if (dateISO) existingDates.add(dateISO);
+      added++;
+    });
+
+    saveHistory();
+    autofillPrevLast2();
+    renderAll();
+    document.getElementById('bulk-result').textContent = `นำเข้าจาก Excel สำเร็จ ${added} แถว (ข้าม ${skipped} แถวที่ซ้ำหรืออ่านไม่ออก)`;
+  } catch (err) {
+    alert('อ่านไฟล์ Excel ไม่สำเร็จ ตรวจสอบว่าเป็นไฟล์ที่ส่งออกจากเครื่องมือนี้ หรือมีคอลัมน์ วันที่ / รางวัลที่ 1 / เลขท้าย 2 ตัว');
+  }
+  e.target.value = '';
+});
+
+document.getElementById('fetch-api-btn').addEventListener('click', fetchFromApi);
+
+document.getElementById('bulk-add-btn').addEventListener('click', async () => {
+  const raw = document.getElementById('bulk-input').value;
+  const errEl = document.getElementById('bulk-error');
+  const resultEl = document.getElementById('bulk-result');
+  errEl.textContent = '';
+  resultEl.textContent = '';
+
+  const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+  if (lines.length === 0) { errEl.textContent = 'กรุณาวางข้อมูลก่อนกดนำเข้า'; return; }
+
+  let added = 0, skipped = 0;
+  lines.forEach(line => {
+    const parts = line.split(',').map(p => p.trim());
+    const dateVal = parts[0] ? parseThaiDate(parts[0]) : null;
+    const firstVal = parts[1] && validateFirst(parts[1]) ? parts[1] : null;
+    const last2Val = parts[2] && validateLast2(parts[2]) ? parts[2] : null;
+
+    if (!dateVal && !firstVal && !last2Val) { skipped++; return; }
+    if (!firstVal && !last2Val) { skipped++; return; }
+
+    history.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: dateVal, first: firstVal, last2: last2Val });
+    added++;
+  });
+
+  if (added === 0) {
+    errEl.textContent = 'ไม่พบบรรทัดที่อ่านค่าได้ ตรวจรูปแบบอีกครั้ง: วว/ดด/ปปปป, รางวัลที่1, เลขท้าย2ตัว';
+    return;
+  }
+
+  await saveHistory();
+  autofillPrevLast2();
+  renderAll();
+  resultEl.textContent = `นำเข้าสำเร็จ ${added} งวด${skipped > 0 ? ` (ข้าม ${skipped} บรรทัดที่อ่านไม่ออก)` : ''}`;
+  document.getElementById('bulk-input').value = '';
+});
+
+document.getElementById('bulk-clear-btn').addEventListener('click', () => {
+  document.getElementById('bulk-input').value = '';
+  document.getElementById('bulk-error').textContent = '';
+  document.getElementById('bulk-result').textContent = '';
+});
+
+document.getElementById('analyze-btn').addEventListener('click', analyzeConnections);
+document.getElementById('calc-btn').addEventListener('click', calculate);
+document.getElementById('explain-btn').addEventListener('click', () => {
+  const d = document.getElementById('formula-details');
+  d.open = true;
+  d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+function renderAll() { renderHistoryTable(); }
+
+loadHistory();
+</script>
+
+</body>
+</html>
