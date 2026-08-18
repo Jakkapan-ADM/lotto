@@ -554,6 +554,7 @@ function renderConnectionNumbers(prevLast2, draw) {
   const list = document.getElementById('connection-list');
   const mostRecent = history[0] || null;
   const prevFirst = mostRecent && mostRecent.first ? mostRecent.first : null;
+  const prevFirst3 = prevFirst ? prevFirst.slice(-3) : null;
 
   const rows = [];
   const conn = {};
@@ -581,6 +582,42 @@ function renderConnectionNumbers(prevLast2, draw) {
   const reversedPrev = reverse2(prevLast2);
   conn.reversedPrev = reversedPrev;
   rows.push({ label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป', value: reversedPrev });
+
+  // 5. เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำในงวดถัดไป
+  if (prevFirst3) {
+    conn.prevFirst3Repeat = prevFirst3;
+    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: prevFirst3 });
+  } else {
+    conn.prevFirst3Repeat = null;
+    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
+  }
+
+  // 6. เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนกลับหลัก
+  if (prevFirst3) {
+    const rev3 = reverse3(prevFirst3);
+    conn.prevFirst3Reversed = rev3;
+    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนกลับหลัก', value: rev3 });
+  } else {
+    conn.prevFirst3Reversed = null;
+  }
+
+  // 7. เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน + วัน/เดือนงวดถัดไป
+  if (prevFirst3) {
+    const first3Sumdate = pad3(parseInt(prevFirst3, 10) + draw.day + draw.month);
+    conn.first3Sumdate = first3Sumdate;
+    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน + วัน/เดือนงวดถัดไป', value: first3Sumdate });
+  } else {
+    conn.first3Sumdate = null;
+  }
+
+  // 8. หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน = หลักหน่วยรางวัลที่ 1 งวดถัดไป
+  if (prevFirst3) {
+    const first3Unit = prevFirst3.slice(-1);
+    conn.first3Unit = first3Unit;
+    rows.push({ label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน', value: `ลงท้าย ${first3Unit}` });
+  } else {
+    conn.first3Unit = null;
+  }
 
   list.innerHTML = rows.map(r => `
     <div class="connection-row">
@@ -671,6 +708,38 @@ function buildFormulas() {
       target: 'last2unit',
       baseline: 0.1,
       predict: (prev) => (prev.last2 ? [prev.last2.slice(-1)] : [])
+    },
+    {
+      id: 'firstRepeat',
+      label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำในงวดถัดไป',
+      target: 'first3',
+      baseline: 0.001,
+      predict: (prev) => (prev.first ? [prev.first.slice(-3)] : [])
+    },
+    {
+      id: 'firstReverse',
+      label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนกลับหลักในงวดถัดไป',
+      target: 'first3',
+      baseline: 0.001,
+      predict: (prev) => (prev.first ? [reverse3(prev.first.slice(-3))] : [])
+    },
+    {
+      id: 'firstSumdate',
+      label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน + วัน/เดือนงวดถัดไป',
+      target: 'first3',
+      baseline: 0.001,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.first) return [];
+        return [pad3(parseInt(prev.first.slice(-3), 10) + d.day + d.month)];
+      }
+    },
+    {
+      id: 'firstUnitsOnly',
+      label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน = หลักหน่วยรางวัลที่ 1 งวดถัดไป',
+      target: 'first3unit',
+      baseline: 0.1,
+      predict: (prev) => (prev.first ? [prev.first.slice(-1)] : [])
     }
   );
 
@@ -687,6 +756,7 @@ function runFormula(f, sorted) {
     if (f.target === 'last2') actual = next.last2 || null;
     else if (f.target === 'last2unit') actual = next.last2 ? next.last2.slice(-1) : null;
     else if (f.target === 'first3') actual = next.first ? next.first.slice(-3) : null;
+    else if (f.target === 'first3unit') actual = next.first ? next.first.slice(-1) : null;
     if (!actual) continue;
 
     const preds = f.predict(prev, next) || [];
@@ -731,6 +801,12 @@ function checkAccuracy() {
         if (p.conn.prevFirst2) checks.push({ label: 'สองหลักท้ายรางวัลที่1 งวดก่อน', hit: p.conn.prevFirst2 === actualLast2, predicted: p.conn.prevFirst2 });
         checks.push({ label: 'เลขท้ายงวดก่อน+วัน/เดือน', hit: p.conn.sumdate === actualLast2, predicted: p.conn.sumdate });
         checks.push({ label: 'เลขท้ายงวดก่อนกลับหลัก', hit: p.conn.reversedPrev === actualLast2, predicted: p.conn.reversedPrev });
+      }
+      if (actualFirst3 && p.conn) {
+        if (p.conn.prevFirst3Repeat) checks.push({ label: 'เลข3ตัวท้ายรางวัลที่1 งวดก่อนออกซ้ำ', hit: p.conn.prevFirst3Repeat === actualFirst3, predicted: p.conn.prevFirst3Repeat });
+        if (p.conn.prevFirst3Reversed) checks.push({ label: 'เลข3ตัวท้ายรางวัลที่1 งวดก่อนกลับหลัก', hit: p.conn.prevFirst3Reversed === actualFirst3, predicted: p.conn.prevFirst3Reversed });
+        if (p.conn.first3Sumdate) checks.push({ label: 'เลข3ตัวท้ายรางวัลที่1 งวดก่อน+วัน/เดือน', hit: p.conn.first3Sumdate === actualFirst3, predicted: p.conn.first3Sumdate });
+        if (p.conn.first3Unit) checks.push({ label: 'หลักหน่วยเลข3ตัวท้ายรางวัลที่1 งวดก่อน', hit: p.conn.first3Unit === actualFirst3.slice(-1), predicted: `ลงท้าย ${p.conn.first3Unit}` });
       }
 
       return { date: d, actualLast2, actualFirst3, checks };
