@@ -246,24 +246,6 @@
   </div>
 
   <div class="card">
-    <h2>ดึงข้อมูลย้อนหลังอัตโนมัติ</h2>
-    <p class="sub">ดึงผลรางวัลจริงย้อนหลังจาก API สาธารณะ (<code>lotto.api.rayriffy.com</code> ซึ่งรวบรวมจาก sanook.com ไม่ใช่เว็บทางการของ กสท. โดยตรง) เข้ามาเก็บให้อัตโนมัติ ไม่ต้องพิมพ์หรือวางเอง — ถ้าดึงไม่สำเร็จเพราะข้อจำกัดเครือข่ายของหน้านี้ ให้ใช้วิธีวางข้อมูลด้านล่างแทน</p>
-    <div class="form-row">
-      <div class="field">
-        <label for="years-back-select">ย้อนหลังกี่ปี</label>
-        <select id="years-back-select" style="width:100%; padding:9px 10px; font-size:15px; border:1px solid var(--line); border-radius:8px; background:#FEFCF6; color:var(--ink); font-family:'Noto Sans Thai',sans-serif;">
-          <option value="1">1 ปี</option>
-          <option value="3">3 ปี</option>
-          <option value="5">5 ปี</option>
-          <option value="10" selected>10 ปี</option>
-        </select>
-      </div>
-    </div>
-    <button id="fetch-api-btn">ดึงข้อมูลอัตโนมัติ</button>
-    <p class="sub" id="fetch-progress" style="margin-top:10px;"></p>
-  </div>
-
-  <div class="card">
     <h2>วางข้อมูลทีเดียวหลายงวด</h2>
     <p class="sub">คัดลอกผลรางวัลจากแหล่งทางการ (เช่น เว็บไซต์สำนักงานสลากกินแบ่งรัฐบาล glo.or.th) แล้ววางที่นี่ 1 บรรทัดต่อ 1 งวด รูปแบบ: <b>วว/ดด/ปปปป, รางวัลที่1(6หลัก), เลขท้าย2ตัว</b> เช่น <code>16/01/2569,123456,78</code> — ใส่ไม่ครบทุกช่องก็ได้ ระบบจะข้ามบรรทัดที่อ่านไม่ออกให้อัตโนมัติ</p>
     <textarea id="bulk-input" rows="6" style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font-family:'Noto Sans Thai',sans-serif; font-size:14px; background:#FEFCF6; color:var(--ink);" placeholder="16/01/2569,123456,78&#10;01/01/2569,654321,90&#10;16/12/2568,,45"></textarea>
@@ -819,90 +801,6 @@ function parseThaiDate(str) {
   return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
-function extractFirstPrize(resp) {
-  if (!resp || !resp.prizes) return null;
-  let entry = resp.prizes.find(p => p.id === 'prizeFirst');
-  if (!entry) entry = resp.prizes.find(p => /รางวัลที่ ?1(?!\d)/.test(p.name || ''));
-  return (entry && entry.number && entry.number[0]) ? entry.number[0] : null;
-}
-
-function extractBackTwo(resp) {
-  if (!resp || !resp.runningNumbers) return null;
-  let entry = resp.runningNumbers.find(r => /back.*two/i.test(r.id || '') || /เลขท้าย.*2\s*ตัว/.test(r.name || ''));
-  if (!entry && resp.runningNumbers.length >= 3) entry = resp.runningNumbers[2];
-  return (entry && entry.number && entry.number[0]) ? entry.number[0] : null;
-}
-
-function buildDrawDateCandidates(yearsBack) {
-  const today = new Date();
-  const startYear = today.getFullYear() - yearsBack;
-  const candidates = [];
-  for (let y = startYear; y <= today.getFullYear(); y++) {
-    for (let mo = 1; mo <= 12; mo++) {
-      [1, 16].forEach(day => {
-        const dt = new Date(y, mo - 1, day);
-        if (dt > today) return;
-        if (dt < new Date(startYear, today.getMonth(), today.getDate())) {
-          // still allow, range is approximate by full years
-        }
-        candidates.push({ day, month: mo, year: y });
-      });
-    }
-  }
-  return candidates;
-}
-
-async function fetchFromApi() {
-  const btn = document.getElementById('fetch-api-btn');
-  const progressEl = document.getElementById('fetch-progress');
-  const yearsBack = parseInt(document.getElementById('years-back-select').value, 10);
-  const candidates = buildDrawDateCandidates(yearsBack);
-  const existingDates = new Set(history.map(h => h.date).filter(Boolean));
-
-  btn.disabled = true;
-  let done = 0, added = 0, failed = 0;
-  const batchSize = 6;
-  const newEntries = [];
-
-  for (let i = 0; i < candidates.length; i += batchSize) {
-    const batch = candidates.slice(i, i + batchSize);
-    await Promise.all(batch.map(async (c) => {
-      const dateISO = `${c.year}-${String(c.month).padStart(2, '0')}-${String(c.day).padStart(2, '0')}`;
-      done++;
-      if (existingDates.has(dateISO)) return;
-      const beYear = c.year + 543;
-      const id = `${String(c.day).padStart(2, '0')}${String(c.month).padStart(2, '0')}${beYear}`;
-      try {
-        const res = await fetch(`https://lotto.api.rayriffy.com/lotto/${id}`);
-        if (!res.ok) { failed++; return; }
-        const data = await res.json();
-        if (data.status !== 'success' || !data.response) { failed++; return; }
-        const first = extractFirstPrize(data.response);
-        const last2 = extractBackTwo(data.response);
-        if (!first && !last2) { failed++; return; }
-        newEntries.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date: dateISO, first: first || null, last2: last2 || null });
-        added++;
-      } catch (e) {
-        failed++;
-      }
-    }));
-    progressEl.textContent = `กำลังดึงข้อมูล... ${done}/${candidates.length} (สำเร็จ ${added}, ไม่สำเร็จ ${failed})`;
-  }
-
-  if (added === 0) {
-    progressEl.textContent = `ดึงข้อมูลอัตโนมัติไม่สำเร็จเลย (ลองไป ${done} งวด) อาจเป็นเพราะหน้านี้ถูกจำกัดการเชื่อมต่อเครือข่ายภายนอก — กรุณาใช้วิธี "วางข้อมูลทีเดียวหลายงวด" ด้านล่างแทน`;
-    btn.disabled = false;
-    return;
-  }
-
-  history = history.concat(newEntries);
-  await saveHistory();
-  autofillPrevLast2();
-  renderAll();
-  progressEl.textContent = `เสร็จสิ้น: นำเข้าสำเร็จ ${added} งวด จากทั้งหมด ${candidates.length} งวดที่ลองดึง (ไม่สำเร็จ/ไม่พบข้อมูล ${failed} งวด)`;
-  btn.disabled = false;
-}
-
 function exportToExcel() {
   if (history.length === 0) {
     alert('ยังไม่มีข้อมูลให้ส่งออก ลองเพิ่มหรือดึงข้อมูลก่อน');
@@ -975,7 +873,6 @@ document.getElementById('import-excel-file').addEventListener('change', async (e
   e.target.value = '';
 });
 
-document.getElementById('fetch-api-btn').addEventListener('click', fetchFromApi);
 
 document.getElementById('bulk-add-btn').addEventListener('click', async () => {
   const raw = document.getElementById('bulk-input').value;
