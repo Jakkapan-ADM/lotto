@@ -564,7 +564,7 @@ function renderConnectionNumbers(prevLast2, draw) {
   // 1. หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป
   const unitsDigit = prevLast2.slice(-1);
   conn.unitsDigit = unitsDigit;
-  rows.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: `ลงท้าย ${unitsDigit}`, formulaId: 'unitsonly' });
+  rows.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: unitsDigit, formulaId: 'unitsonly' });
 
   // 2. สองหลักท้ายรางวัลที่ 1 ของงวดก่อน
   if (prevFirst) {
@@ -616,7 +616,7 @@ function renderConnectionNumbers(prevLast2, draw) {
   if (prevFirst3) {
     const first3Unit = prevFirst3.slice(-1);
     conn.first3Unit = first3Unit;
-    rows.push({ label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน', value: `ลงท้าย ${first3Unit}`, formulaId: 'firstUnitsOnly' });
+    rows.push({ label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน', value: first3Unit, formulaId: 'firstUnitsOnly' });
   } else {
     conn.first3Unit = null;
   }
