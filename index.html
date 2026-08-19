@@ -196,14 +196,6 @@
     </div>
 
     <div class="prize-block">
-      <div class="prize-label">เลขเด่นรางวัลที่ 1 (แนวทางหลักร้อย-หลักพัน)</div>
-      <div class="digits" id="first-digits">
-        <div class="digit">-</div><div class="digit">-</div><div class="digit">-</div>
-      </div>
-      <div class="chip-row" id="first-combo-row"></div>
-    </div>
-
-    <div class="prize-block">
       <div class="prize-label">เลขเด่นเลขท้าย 2 ตัว</div>
       <div class="digits" id="last2-digits">
         <div class="digit">-</div><div class="digit">-</div>
@@ -221,13 +213,12 @@
 
     <div class="btn-row">
       <button id="calc-btn">คำนวณเลขเด่น</button>
-      <button class="secondary" id="explain-btn">สูตรคำนวณคืออะไร</button>
     </div>
   </div>
 
   <div class="card">
     <h2>ข้อมูลสำหรับคำนวณ</h2>
-    <p class="sub">ใช้วันที่ออกสลากงวดนี้ และวันเกิดของคุณ ตามสูตรที่กำหนด</p>
+    <p class="sub">ใช้วันที่ออกสลากงวดนี้และเลขท้าย 2 ตัวงวดก่อนหน้า ตามสูตรที่กำหนด</p>
     <div class="form-row">
       <div class="field">
         <label for="draw-date-input">วันที่ออกสลากงวดนี้</label>
@@ -236,12 +227,6 @@
       <div class="field">
         <label for="prev-last2-input">เลขท้าย 2 ตัวงวดก่อนหน้า</label>
         <input type="text" id="prev-last2-input" placeholder="เช่น 76" maxlength="2" inputmode="numeric">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="field">
-        <label for="birth-date-input">วันเกิดของคุณ</label>
-        <input type="date" id="birth-date-input">
       </div>
     </div>
     <div class="error-msg" id="form-error"></div>
@@ -316,38 +301,14 @@
     </div>
   </div>
 
-  <div class="card">
-    <details class="formula" id="formula-details">
-      <summary>สูตรที่ใช้คำนวณ (คลิกเพื่อดูรายละเอียด)</summary>
-      <p><b style="color:var(--maroon-dark)">เลขท้าย 2 ตัว</b></p>
-      <ol>
-        <li>นำวัน + เดือน + สองหลักท้ายของปี พ.ศ. ของวันที่ออกสลากงวดนี้มาบวกกัน</li>
-        <li>นำผลรวมนั้นบวกกับหลักหน่วยของเลขท้าย 2 ตัวงวดก่อนหน้า</li>
-        <li>หากผลลัพธ์เกิน 99 ให้ลบด้วย 100 จนเหลือ 2 หลัก</li>
-        <li>ได้เลขเด่น และเลขชุดแนะนำคือเลขเด่นกับเลขที่กลับหลักกัน</li>
-      </ol>
-      <p><b style="color:var(--maroon-dark)">รางวัลที่ 1 (แนวทางหลักร้อย-หลักพัน)</b></p>
-      <ol>
-        <li>นำวันเกิด + เดือนเกิด + สองหลักท้ายปีเกิด (พ.ศ.) ของคุณมาบวกกัน</li>
-        <li>บวกด้วยวันที่และเดือนของวันออกสลากงวดนี้</li>
-        <li>บวกด้วยเลขนำโชคประจำราศีของเดือนที่ออกสลาก (แต่ละเดือนมีราศีและเลขนำโชคประจำตัวตามความเชื่อ)</li>
-        <li>หากผลลัพธ์เกิน 999 ให้ลบด้วย 1000 จนเหลือ 3 หลัก ได้เป็นเลขเด่น</li>
-        <li>เลขชุดแนะนำคือเลขเด่นกับเลข 3 หลักที่กลับหลักกัน</li>
-      </ol>
-      <p>หากเลขเด่นที่คำนวณได้ซ้ำหรือวนกับเลขที่เคยออกในประวัติ ระบบจะแนะนำให้กลับคู่ตัวเลขเป็นชุดสำรอง</p>
-      <p>ทั้งหมดนี้เป็นสูตรตามความเชื่อและวิธีคิดเลขแบบดั้งเดิม ไม่ใช่การคำนวณทางคณิตศาสตร์ที่มีผลต่อความน่าจะเป็นจริง</p>
-    </details>
-  </div>
-
   <div class="disclaimer">
-    <b>ข้อควรทราบ:</b> การออกรางวัลสลากกินแบ่งรัฐบาลใช้การสุ่มลูกบอลจริง แต่ละงวดเป็นเหตุการณ์อิสระทางสถิติ ผลรางวัลของงวดก่อนหน้าและวันเกิดของคุณไม่มีผลต่อความน่าจะเป็นของตัวเลขที่จะออกในงวดถัดไปแต่อย่างใด (แต่ละหลักมีโอกาสออก 1 ใน 10 เท่ากันเสมอ) สูตรนี้เป็นวิธีคิดเลขตามความเชื่อดั้งเดิม จัดทำขึ้นเพื่อความบันเทิงเท่านั้น ไม่ควรใช้เป็นหลักในการตัดสินใจทางการเงิน
+    <b>ข้อควรทราบ:</b> การออกรางวัลสลากกินแบ่งรัฐบาลใช้การสุ่มลูกบอลจริง แต่ละงวดเป็นเหตุการณ์อิสระทางสถิติ ผลรางวัลของงวดก่อนหน้าไม่มีผลต่อความน่าจะเป็นของตัวเลขที่จะออกในงวดถัดไปแต่อย่างใด (แต่ละหลักมีโอกาสออก 1 ใน 10 เท่ากันเสมอ) สูตรและสมมติฐานในเครื่องมือนี้จัดทำขึ้นเพื่อความบันเทิงและการสำรวจข้อมูลเท่านั้น ไม่ควรใช้เป็นหลักในการตัดสินใจทางการเงิน
   </div>
 
 </div>
 
 <script>
 const STORAGE_KEY = 'lottery-history-th';
-const BIRTHDATE_KEY = 'lottery-birthdate-th';
 const PREDICTIONS_KEY = 'lottery-predictions-th';
 let predictions = {};
 let history = [];
@@ -386,10 +347,6 @@ function loadHistory() {
     if (raw) history = JSON.parse(raw);
   } catch (e) { history = []; }
   try {
-    const b = localStorage.getItem(BIRTHDATE_KEY);
-    if (b) document.getElementById('birth-date-input').value = b;
-  } catch (e) {}
-  try {
     const p = localStorage.getItem(PREDICTIONS_KEY);
     if (p) predictions = JSON.parse(p);
   } catch (e) { predictions = {}; }
@@ -400,11 +357,6 @@ function loadHistory() {
 function saveHistory() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); }
   catch (e) { console.error('บันทึกข้อมูลไม่สำเร็จ', e); }
-}
-
-function saveBirthdate(val) {
-  try { localStorage.setItem(BIRTHDATE_KEY, val); }
-  catch (e) {}
 }
 
 function savePrediction(dateISO, record) {
@@ -418,10 +370,6 @@ function autofillPrevLast2() {
     document.getElementById('prev-last2-input').value = history[0].last2;
   }
 }
-
-document.getElementById('birth-date-input').addEventListener('change', (e) => {
-  saveBirthdate(e.target.value);
-});
 
 function validateFirst(v) { return /^\d{6}$/.test(v); }
 function validateLast2(v) { return /^\d{2}$/.test(v); }
@@ -493,48 +441,32 @@ function calculate() {
   errEl.textContent = '';
 
   const drawDateVal = document.getElementById('draw-date-input').value;
-  const birthDateVal = document.getElementById('birth-date-input').value;
   const prevLast2 = document.getElementById('prev-last2-input').value.trim();
 
   if (!drawDateVal) { errEl.textContent = 'กรุณาเลือกวันที่ออกสลากงวดนี้'; return; }
   if (!validateLast2(prevLast2)) { errEl.textContent = 'กรุณากรอกเลขท้าย 2 ตัวงวดก่อนหน้าให้ครบ 2 หลัก'; return; }
-  if (!birthDateVal) { errEl.textContent = 'กรุณาเลือกวันเกิดของคุณ'; return; }
 
   const draw = parseDateParts(drawDateVal);
-  const birth = parseDateParts(birthDateVal);
   const prevUnits = parseInt(prevLast2.slice(-1), 10);
 
   const last2Sum = draw.day + draw.month + draw.yearBE2 + prevUnits;
   const last2Result = pad2(last2Sum);
   const last2Reversed = reverse2(last2Result);
 
-  const birthSum = birth.day + birth.month + birth.yearBE2;
-  const zodiac = ZODIAC_BY_MONTH[draw.month];
-  const firstSum = birthSum + draw.day + draw.month + zodiac.lucky;
-  const firstResult = pad3(firstSum);
-  const firstReversed = reverse3(firstResult);
-
   const last2Els = document.querySelectorAll('#last2-digits .digit');
-  const firstEls = document.querySelectorAll('#first-digits .digit');
   last2Els[0].textContent = last2Result[0];
   last2Els[1].textContent = last2Result[1];
-  firstEls[0].textContent = firstResult[0];
-  firstEls[1].textContent = firstResult[1];
-  firstEls[2].textContent = firstResult[2];
   pulseEl(document.getElementById('last2-digits'));
-  pulseEl(document.getElementById('first-digits'));
 
   document.getElementById('last2-combo-row').innerHTML =
     `<span class="chip">${last2Result}</span><span class="chip">${last2Reversed}</span>`;
-  document.getElementById('first-combo-row').innerHTML =
-    `<span class="chip">${firstResult}</span><span class="chip">${firstReversed}</span>`;
 
+  const zodiac = ZODIAC_BY_MONTH[draw.month];
   document.getElementById('basis-tag').textContent =
     `งวด ${draw.day}/${draw.month}/${draw.yearBE2} · ราศี${zodiac.name}`;
 
   const pastLast2 = history.map(h => h.last2).filter(Boolean);
-  const pastFirst3 = history.map(h => h.first ? h.first.slice(-3) : null).filter(Boolean);
-  const dup = pastLast2.includes(last2Result) || pastFirst3.includes(firstResult);
+  const dup = pastLast2.includes(last2Result);
   document.getElementById('swap-note').textContent = dup
     ? 'พบเลขซ้ำกับประวัติที่บันทึกไว้ ตามเคล็ดให้ลองกลับคู่ตัวเลขไว้เป็นชุดสำรองด้วย'
     : '';
@@ -544,8 +476,6 @@ function calculate() {
   savePrediction(drawDateVal, {
     last2: last2Result,
     last2Reversed: last2Reversed,
-    first3: firstResult,
-    first3Reversed: firstReversed,
     conn: conn,
     savedAt: Date.now()
   });
@@ -603,10 +533,28 @@ function renderConnectionNumbers(prevLast2, draw) {
     conn.first3Unit = null;
   }
 
-  // 9. สูตรที่บังเอิญเจอจากการค้นหา 500 สูตรแบบสุ่ม (ใส่ไว้เพื่อความสนุก ไม่ใช่สูตรที่พิสูจน์แล้ว)
+  // 9-12. สูตรที่บังเอิญเจอจากการค้นหา 500 สูตรแบบสุ่ม (ใส่ไว้เพื่อความสนุก ไม่ใช่สูตรที่พิสูจน์แล้ว)
   const luckyPick = pad2(2 * parseInt(prevLast2, 10) - draw.day - draw.month + 97);
   conn.luckyPick = luckyPick;
-  rows.push({ label: 'สูตรสุ่มที่เคย "ดูดี" ที่สุดจากการค้นหา 500 สูตร', value: luckyPick, formulaId: 'luckyPick', isDredged: true });
+  rows.push({ label: 'สูตรสุ่มที่เคย "ดูดี" ที่สุดจากการค้นหา 500 สูตร (อันดับ 1)', value: luckyPick, formulaId: 'luckyPick', isDredged: true });
+
+  const luckyPick2 = pad2(2 * draw.day - 2 * draw.month - 3 * draw.yearBE2 + 75);
+  conn.luckyPick2 = luckyPick2;
+  rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 2)', value: luckyPick2, formulaId: 'luckyPick2', isDredged: true });
+
+  if (prevFirst) {
+    const prevFirstLast1 = parseInt(prevFirst.slice(-1), 10);
+    const luckyPick3 = pad2(parseInt(prevLast2, 10) + prevFirstLast1 - draw.day + draw.month - 2 * draw.yearBE2 + 82);
+    conn.luckyPick3 = luckyPick3;
+    rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 3)', value: luckyPick3, formulaId: 'luckyPick3', isDredged: true });
+
+    const luckyPick4 = pad2(-2 * parseInt(prevLast2, 10) - prevFirstLast1 + draw.day - draw.month - 3 * draw.yearBE2 + 49);
+    conn.luckyPick4 = luckyPick4;
+    rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 4)', value: luckyPick4, formulaId: 'luckyPick4', isDredged: true });
+  } else {
+    conn.luckyPick3 = null;
+    conn.luckyPick4 = null;
+  }
 
   // คำนวณอัตราถูกจริงจากประวัติ (backtest) ให้แต่ละสมมติฐาน
   const sortedHist = getSortedHistoryWithDate();
@@ -648,26 +596,7 @@ function getSortedHistoryWithDate() {
 }
 
 function buildFormulas() {
-  const birthDateVal = document.getElementById('birth-date-input').value;
   const formulas = [];
-
-  if (birthDateVal) {
-    const birth = parseDateParts(birthDateVal);
-    formulas.push({
-      id: 'mainFirst3',
-      label: 'สูตรหลัก: รางวัลที่ 1 (วันเกิด+วันงวด+ราศี) ทายตรงหรือกลับหลัก',
-      target: 'first3',
-      baseline: 0.002,
-      predict: (prev, next) => {
-        const d = parseDateParts(next.date);
-        if (!d) return [];
-        const zodiac = ZODIAC_BY_MONTH[d.month];
-        const birthSum = birth.day + birth.month + birth.yearBE2;
-        const p = pad3(birthSum + d.day + d.month + zodiac.lucky);
-        return [p, reverse3(p)];
-      }
-    });
-  }
 
   formulas.push(
     {
@@ -724,7 +653,7 @@ function buildFormulas() {
     },
     {
       id: 'luckyPick',
-      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (อันดับ 1, ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
       target: 'last2',
       baseline: 0.01,
       isDredged: true,
@@ -732,6 +661,44 @@ function buildFormulas() {
         const d = parseDateParts(next.date);
         if (!d || !prev.last2) return [];
         return [pad2(2 * parseInt(prev.last2, 10) - d.day - d.month + 97)];
+      }
+    },
+    {
+      id: 'luckyPick2',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (อันดับ 2, ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      target: 'last2',
+      baseline: 0.01,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d) return [];
+        return [pad2(2 * d.day - 2 * d.month - 3 * d.yearBE2 + 75)];
+      }
+    },
+    {
+      id: 'luckyPick3',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (อันดับ 3, ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      target: 'last2',
+      baseline: 0.01,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2 || !prev.first) return [];
+        const prevFirstLast1 = parseInt(prev.first.slice(-1), 10);
+        return [pad2(parseInt(prev.last2, 10) + prevFirstLast1 - d.day + d.month - 2 * d.yearBE2 + 82)];
+      }
+    },
+    {
+      id: 'luckyPick4',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (อันดับ 4, ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      target: 'last2',
+      baseline: 0.01,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2 || !prev.first) return [];
+        const prevFirstLast1 = parseInt(prev.first.slice(-1), 10);
+        return [pad2(-2 * parseInt(prev.last2, 10) - prevFirstLast1 + d.day - d.month - 3 * d.yearBE2 + 49)];
       }
     },
     {
@@ -818,14 +785,15 @@ function checkAccuracy() {
       if (actualLast2) {
         checks.push({ label: 'เลขท้าย 2 ตัว (สูตรหลัก)', hit: p.last2 === actualLast2 || p.last2Reversed === actualLast2, predicted: `${p.last2} / ${p.last2Reversed}` });
       }
-      if (actualFirst3) {
-        checks.push({ label: 'รางวัลที่ 1 (3 หลักท้าย)', hit: p.first3 === actualFirst3 || p.first3Reversed === actualFirst3, predicted: `${p.first3} / ${p.first3Reversed}` });
-      }
       if (actualLast2 && p.conn) {
         checks.push({ label: 'หลักหน่วยงวดก่อน', hit: p.conn.unitsDigit === actualLast2.slice(-1), predicted: `ลงท้าย ${p.conn.unitsDigit}` });
         if (p.conn.prevFirst2) checks.push({ label: 'สองหลักท้ายรางวัลที่1 งวดก่อน', hit: p.conn.prevFirst2 === actualLast2, predicted: p.conn.prevFirst2 });
         checks.push({ label: 'เลขท้ายงวดก่อน+วัน/เดือน', hit: p.conn.sumdate === actualLast2, predicted: p.conn.sumdate });
         checks.push({ label: 'เลขท้ายงวดก่อนกลับหลัก', hit: p.conn.reversedPrev === actualLast2, predicted: p.conn.reversedPrev });
+        if (p.conn.luckyPick) checks.push({ label: 'สูตรสุ่ม (อันดับ 1)', hit: p.conn.luckyPick === actualLast2, predicted: p.conn.luckyPick });
+        if (p.conn.luckyPick2) checks.push({ label: 'สูตรสุ่ม (อันดับ 2)', hit: p.conn.luckyPick2 === actualLast2, predicted: p.conn.luckyPick2 });
+        if (p.conn.luckyPick3) checks.push({ label: 'สูตรสุ่ม (อันดับ 3)', hit: p.conn.luckyPick3 === actualLast2, predicted: p.conn.luckyPick3 });
+        if (p.conn.luckyPick4) checks.push({ label: 'สูตรสุ่ม (อันดับ 4)', hit: p.conn.luckyPick4 === actualLast2, predicted: p.conn.luckyPick4 });
       }
       if (actualFirst3 && p.conn) {
         if (p.conn.prevFirst3Repeat) checks.push({ label: 'เลข3ตัวท้ายรางวัลที่1 งวดก่อนออกซ้ำ', hit: p.conn.prevFirst3Repeat === actualFirst3, predicted: p.conn.prevFirst3Repeat });
@@ -893,10 +861,6 @@ function analyzeConnections() {
     return;
   }
 
-  const birthNote = document.getElementById('birth-date-input').value
-    ? ''
-    : '<p class="analysis-meta" style="color:var(--maroon);">ยังไม่ได้กรอกวันเกิดในการ์ดคำนวณเลขเด่นด้านบน จึงยังทดสอบสูตรหลักรางวัลที่ 1 ให้ไม่ได้ กรอกวันเกิดก่อนแล้วกดวิเคราะห์ใหม่เพื่อรวมสูตรนี้ด้วย</p>';
-
   const formulas = buildFormulas();
   const results = formulas.map(f => runFormula(f, sorted)).sort((a, b) => b.rate - a.rate);
   const pairCount = sorted.length - 1;
@@ -922,8 +886,7 @@ function analyzeConnections() {
   }).join('');
 
   resultEl.innerHTML = `
-    ${birthNote}
-    <p class="analysis-meta">วิเคราะห์จาก ${sorted.length} งวด (${pairCount} คู่ต่อเนื่อง) เรียงตามวันที่ตั้งแต่ ${sorted[0].date} ถึง ${sorted[sorted.length - 1].date} — รวมทั้งสูตรหลัก (คำนวณจากวันเกิด/วันงวด) และสมมติฐานความเชื่อมโยงทั้ง 4 แบบ</p>
+    <p class="analysis-meta">วิเคราะห์จาก ${sorted.length} งวด (${pairCount} คู่ต่อเนื่อง) เรียงตามวันที่ตั้งแต่ ${sorted[0].date} ถึง ${sorted[sorted.length - 1].date} — รวมทั้งสูตรหลักเลขท้าย 2 ตัว และสมมติฐานความเชื่อมโยงทั้งหมด</p>
     <table class="analysis">
       <thead><tr><th>สูตร / สมมติฐาน</th><th>ทายถูก/ทั้งหมด</th><th>อัตราถูกจริง</th><th>โอกาสสุ่มล้วนๆ</th><th>ข้อสรุป</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -1145,11 +1108,6 @@ function analyzeConjunction() {
 
 document.getElementById('analyze-conjunction-btn').addEventListener('click', analyzeConjunction);
 document.getElementById('calc-btn').addEventListener('click', calculate);
-document.getElementById('explain-btn').addEventListener('click', () => {
-  const d = document.getElementById('formula-details');
-  d.open = true;
-  d.scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
 
 function renderAll() { renderHistoryTable(); }
 
