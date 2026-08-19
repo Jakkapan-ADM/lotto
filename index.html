@@ -603,6 +603,11 @@ function renderConnectionNumbers(prevLast2, draw) {
     conn.first3Unit = null;
   }
 
+  // 9. สูตรที่บังเอิญเจอจากการค้นหา 500 สูตรแบบสุ่ม (ใส่ไว้เพื่อความสนุก ไม่ใช่สูตรที่พิสูจน์แล้ว)
+  const luckyPick = pad2(2 * parseInt(prevLast2, 10) - draw.day - draw.month + 97);
+  conn.luckyPick = luckyPick;
+  rows.push({ label: 'สูตรสุ่มที่เคย "ดูดี" ที่สุดจากการค้นหา 500 สูตร', value: luckyPick, formulaId: 'luckyPick', isDredged: true });
+
   // คำนวณอัตราถูกจริงจากประวัติ (backtest) ให้แต่ละสมมติฐาน
   const sortedHist = getSortedHistoryWithDate();
   const statsById = {};
@@ -615,7 +620,9 @@ function renderConnectionNumbers(prevLast2, draw) {
   list.innerHTML = rows.map(r => {
     const s = r.formulaId ? statsById[r.formulaId] : null;
     let statLine = '';
-    if (s) {
+    if (r.isDredged) {
+      statLine = `<div class="connection-stat" style="color:var(--maroon);">⚠ ได้จากการลองสุ่ม 500 สูตรแล้วเลือกตัวที่ดีที่สุดในข้อมูลเก่า — ไม่ผ่านนัยสำคัญทางสถิติ ไม่ควรเชื่อว่าจะถูกในอนาคต</div>`;
+    } else if (s) {
       if (s.total > 0) {
         statLine = `<div class="connection-stat">ถูกจริง ${s.hits}/${s.total} งวด (${(s.rate * 100).toFixed(1)}%) · โอกาสสุ่มล้วนๆ ${(s.baseline * 100).toFixed(s.baseline < 0.01 ? 1 : 0)}%</div>`;
       } else {
@@ -714,6 +721,18 @@ function buildFormulas() {
       target: 'last2unit',
       baseline: 0.1,
       predict: (prev) => (prev.last2 ? [prev.last2.slice(-1)] : [])
+    },
+    {
+      id: 'luckyPick',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 500 สูตร (ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      target: 'last2',
+      baseline: 0.01,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2) return [];
+        return [pad2(2 * parseInt(prev.last2, 10) - d.day - d.month + 97)];
+      }
     },
     {
       id: 'firstRepeat',
