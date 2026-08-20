@@ -551,9 +551,38 @@ function renderConnectionNumbers(prevLast2, draw) {
     const luckyPick4 = pad2(-2 * parseInt(prevLast2, 10) - prevFirstLast1 + draw.day - draw.month - 3 * draw.yearBE2 + 49);
     conn.luckyPick4 = luckyPick4;
     rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 4)', value: luckyPick4, formulaId: 'luckyPick4', isDredged: true });
+
+    const luckyPick5k = pad2(2 * parseInt(prevLast2, 10) - 2 * prevFirstLast1 + draw.day - draw.yearBE2 + 1);
+    conn.luckyPick5k = luckyPick5k;
+    rows.push({ label: 'สูตรสุ่มจากการค้นหา 5,000 สูตร (อันดับ 1)', value: luckyPick5k, formulaId: 'luckyPick5k', isDredged: true });
   } else {
     conn.luckyPick3 = null;
     conn.luckyPick4 = null;
+    conn.luckyPick5k = null;
+  }
+
+  if (prevFirst3) {
+    const prevFirst3Int = parseInt(prevFirst3, 10);
+    const luckyFirst3_1 = pad3(-1 * parseInt(prevLast2, 10) + 3 * draw.day + 2 * draw.month - 2 * draw.yearBE2 + 149);
+    conn.luckyFirst3_1 = luckyFirst3_1;
+    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 1)', value: luckyFirst3_1, formulaId: 'luckyFirst3_1', isDredged: true });
+
+    const luckyFirst3_2 = pad3(-1 * parseInt(prevLast2, 10) + 3 * prevFirst3Int + 2 * draw.day - 2 * draw.month + 2 * draw.yearBE2 + 900);
+    conn.luckyFirst3_2 = luckyFirst3_2;
+    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 2)', value: luckyFirst3_2, formulaId: 'luckyFirst3_2', isDredged: true });
+
+    const luckyFirst3_3 = pad3(parseInt(prevLast2, 10) - 1 * prevFirst3Int - 3 * draw.day + draw.month + draw.yearBE2 + 134);
+    conn.luckyFirst3_3 = luckyFirst3_3;
+    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 3)', value: luckyFirst3_3, formulaId: 'luckyFirst3_3', isDredged: true });
+
+    const luckyFirst3_4 = pad3(-2 * draw.day - draw.month + 3 * draw.yearBE2 + 292);
+    conn.luckyFirst3_4 = luckyFirst3_4;
+    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 4)', value: luckyFirst3_4, formulaId: 'luckyFirst3_4', isDredged: true });
+  } else {
+    conn.luckyFirst3_1 = null;
+    conn.luckyFirst3_2 = null;
+    conn.luckyFirst3_3 = null;
+    conn.luckyFirst3_4 = null;
   }
 
   // คำนวณอัตราถูกจริงจากประวัติ (backtest) ให้แต่ละสมมติฐาน
@@ -702,6 +731,19 @@ function buildFormulas() {
       }
     },
     {
+      id: 'luckyPick5k',
+      label: 'สูตรที่บังเอิญเจอจากการสุ่มค้นหา 5,000 สูตร (อันดับ 1, ไม่ผ่านนัยสำคัญทางสถิติ — ใส่ไว้เพื่อความสนุกเท่านั้น)',
+      target: 'last2',
+      baseline: 0.01,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2 || !prev.first) return [];
+        const prevFirstLast1 = parseInt(prev.first.slice(-1), 10);
+        return [pad2(2 * parseInt(prev.last2, 10) - 2 * prevFirstLast1 + d.day + 0 * d.month - d.yearBE2 + 1)];
+      }
+    },
+    {
       id: 'firstRepeat',
       label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำในงวดถัดไป',
       target: 'first3',
@@ -732,6 +774,56 @@ function buildFormulas() {
       target: 'first3unit',
       baseline: 0.1,
       predict: (prev) => (prev.first ? [prev.first.slice(-1)] : [])
+    },
+    {
+      id: 'luckyFirst3_1',
+      label: 'สูตรเลข 3 ตัวท้ายรางวัลที่ 1 จากการสุ่มค้นหา 100,000 สูตร (อันดับ 1, ไม่ผ่านนัยสำคัญทางสถิติ)',
+      target: 'first3',
+      baseline: 0.001,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2) return [];
+        return [pad3(-1 * parseInt(prev.last2, 10) + 3 * d.day + 2 * d.month - 2 * d.yearBE2 + 149)];
+      }
+    },
+    {
+      id: 'luckyFirst3_2',
+      label: 'สูตรเลข 3 ตัวท้ายรางวัลที่ 1 จากการสุ่มค้นหา 100,000 สูตร (อันดับ 2, ไม่ผ่านนัยสำคัญทางสถิติ)',
+      target: 'first3',
+      baseline: 0.001,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2 || !prev.first) return [];
+        const prevFirst3 = parseInt(prev.first.slice(-3), 10);
+        return [pad3(-1 * parseInt(prev.last2, 10) + 3 * prevFirst3 + 2 * d.day - 2 * d.month + 2 * d.yearBE2 + 900)];
+      }
+    },
+    {
+      id: 'luckyFirst3_3',
+      label: 'สูตรเลข 3 ตัวท้ายรางวัลที่ 1 จากการสุ่มค้นหา 100,000 สูตร (อันดับ 3, ไม่ผ่านนัยสำคัญทางสถิติ)',
+      target: 'first3',
+      baseline: 0.001,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.last2 || !prev.first) return [];
+        const prevFirst3 = parseInt(prev.first.slice(-3), 10);
+        return [pad3(parseInt(prev.last2, 10) - 1 * prevFirst3 - 3 * d.day + d.month + d.yearBE2 + 134)];
+      }
+    },
+    {
+      id: 'luckyFirst3_4',
+      label: 'สูตรเลข 3 ตัวท้ายรางวัลที่ 1 จากการสุ่มค้นหา 100,000 สูตร (อันดับ 4, ไม่ผ่านนัยสำคัญทางสถิติ)',
+      target: 'first3',
+      baseline: 0.001,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d) return [];
+        return [pad3(-2 * d.day - d.month + 3 * d.yearBE2 + 292)];
+      }
     }
   );
 
@@ -790,14 +882,19 @@ function checkAccuracy() {
         if (p.conn.prevFirst2) checks.push({ label: 'สองหลักท้ายรางวัลที่1 งวดก่อน', hit: p.conn.prevFirst2 === actualLast2, predicted: p.conn.prevFirst2 });
         checks.push({ label: 'เลขท้ายงวดก่อน+วัน/เดือน', hit: p.conn.sumdate === actualLast2, predicted: p.conn.sumdate });
         checks.push({ label: 'เลขท้ายงวดก่อนกลับหลัก', hit: p.conn.reversedPrev === actualLast2, predicted: p.conn.reversedPrev });
-        if (p.conn.luckyPick) checks.push({ label: 'สูตรสุ่ม (อันดับ 1)', hit: p.conn.luckyPick === actualLast2, predicted: p.conn.luckyPick });
-        if (p.conn.luckyPick2) checks.push({ label: 'สูตรสุ่ม (อันดับ 2)', hit: p.conn.luckyPick2 === actualLast2, predicted: p.conn.luckyPick2 });
-        if (p.conn.luckyPick3) checks.push({ label: 'สูตรสุ่ม (อันดับ 3)', hit: p.conn.luckyPick3 === actualLast2, predicted: p.conn.luckyPick3 });
-        if (p.conn.luckyPick4) checks.push({ label: 'สูตรสุ่ม (อันดับ 4)', hit: p.conn.luckyPick4 === actualLast2, predicted: p.conn.luckyPick4 });
+        if (p.conn.luckyPick) checks.push({ label: 'สูตรสุ่ม 500 (อันดับ 1)', hit: p.conn.luckyPick === actualLast2, predicted: p.conn.luckyPick });
+        if (p.conn.luckyPick2) checks.push({ label: 'สูตรสุ่ม 500 (อันดับ 2)', hit: p.conn.luckyPick2 === actualLast2, predicted: p.conn.luckyPick2 });
+        if (p.conn.luckyPick3) checks.push({ label: 'สูตรสุ่ม 500 (อันดับ 3)', hit: p.conn.luckyPick3 === actualLast2, predicted: p.conn.luckyPick3 });
+        if (p.conn.luckyPick4) checks.push({ label: 'สูตรสุ่ม 500 (อันดับ 4)', hit: p.conn.luckyPick4 === actualLast2, predicted: p.conn.luckyPick4 });
+        if (p.conn.luckyPick5k) checks.push({ label: 'สูตรสุ่ม 5,000 (อันดับ 1)', hit: p.conn.luckyPick5k === actualLast2, predicted: p.conn.luckyPick5k });
       }
       if (actualFirst3 && p.conn) {
         if (p.conn.prevFirst3Repeat) checks.push({ label: 'เลข3ตัวท้ายรางวัลที่1 งวดก่อนออกซ้ำ', hit: p.conn.prevFirst3Repeat === actualFirst3, predicted: p.conn.prevFirst3Repeat });
         if (p.conn.first3Unit) checks.push({ label: 'หลักหน่วยเลข3ตัวท้ายรางวัลที่1 งวดก่อน', hit: p.conn.first3Unit === actualFirst3.slice(-1), predicted: `ลงท้าย ${p.conn.first3Unit}` });
+        if (p.conn.luckyFirst3_1) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 1)', hit: p.conn.luckyFirst3_1 === actualFirst3, predicted: p.conn.luckyFirst3_1 });
+        if (p.conn.luckyFirst3_2) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 2)', hit: p.conn.luckyFirst3_2 === actualFirst3, predicted: p.conn.luckyFirst3_2 });
+        if (p.conn.luckyFirst3_3) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 3)', hit: p.conn.luckyFirst3_3 === actualFirst3, predicted: p.conn.luckyFirst3_3 });
+        if (p.conn.luckyFirst3_4) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 4)', hit: p.conn.luckyFirst3_4 === actualFirst3, predicted: p.conn.luckyFirst3_4 });
       }
 
       return { date: d, actualLast2, actualFirst3, checks };
