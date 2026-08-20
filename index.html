@@ -92,6 +92,12 @@
     margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line);
   }
   .connection-title { text-align: center; font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+  .connection-group-label {
+    font-family: 'Noto Serif Thai', serif; font-weight: 700; font-size: 13px;
+    color: var(--maroon-dark); margin-bottom: 8px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--gold-light, var(--line));
+  }
+  .connection-sublist { display: flex; flex-direction: column; gap: 8px; }
   .connection-list { display: flex; flex-direction: column; gap: 8px; }
   .connection-row {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
@@ -488,96 +494,92 @@ function renderConnectionNumbers(prevLast2, draw) {
   const prevFirst = mostRecent && mostRecent.first ? mostRecent.first : null;
   const prevFirst3 = prevFirst ? prevFirst.slice(-3) : null;
 
-  const rows = [];
+  const rowsLast2 = [];
+  const rowsFirst3 = [];
   const conn = {};
 
-  // 1. หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป
+  // ===== เลขท้าย 2 ตัว =====
   const unitsDigit = prevLast2.slice(-1);
   conn.unitsDigit = unitsDigit;
-  rows.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: unitsDigit, formulaId: 'unitsonly' });
+  rowsLast2.push({ label: 'หลักหน่วยเลขท้ายงวดก่อน = หลักหน่วยงวดถัดไป', value: unitsDigit, formulaId: 'unitsonly' });
 
-  // 2. สองหลักท้ายรางวัลที่ 1 ของงวดก่อน
   if (prevFirst) {
     conn.prevFirst2 = prevFirst.slice(-2);
-    rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: prevFirst.slice(-2), formulaId: 'firstprize2' });
+    rowsLast2.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: prevFirst.slice(-2), formulaId: 'firstprize2' });
   } else {
     conn.prevFirst2 = null;
-    rows.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
+    rowsLast2.push({ label: 'สองหลักท้ายรางวัลที่ 1 ของงวดก่อน', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
   }
 
-  // 3. เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป
   const sumdate = pad2(parseInt(prevLast2, 10) + draw.day + draw.month);
   conn.sumdate = sumdate;
-  rows.push({ label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป', value: sumdate, formulaId: 'sumdate' });
+  rowsLast2.push({ label: 'เลขท้ายงวดก่อน + วัน/เดือนงวดถัดไป', value: sumdate, formulaId: 'sumdate' });
 
-  // 4. เลขท้ายงวดก่อนกลับหลักในงวดถัดไป
   const reversedPrev = reverse2(prevLast2);
   conn.reversedPrev = reversedPrev;
-  rows.push({ label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป', value: reversedPrev, formulaId: 'reverse' });
+  rowsLast2.push({ label: 'เลขท้ายงวดก่อนกลับหลักในงวดถัดไป', value: reversedPrev, formulaId: 'reverse' });
 
-  // 5. เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำในงวดถัดไป
-  if (prevFirst3) {
-    conn.prevFirst3Repeat = prevFirst3;
-    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: prevFirst3, formulaId: 'firstRepeat' });
-  } else {
-    conn.prevFirst3Repeat = null;
-    rows.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
-  }
-
-  // 8. หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน = หลักหน่วยรางวัลที่ 1 งวดถัดไป
-  if (prevFirst3) {
-    const first3Unit = prevFirst3.slice(-1);
-    conn.first3Unit = first3Unit;
-    rows.push({ label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน', value: first3Unit, formulaId: 'firstUnitsOnly' });
-  } else {
-    conn.first3Unit = null;
-  }
-
-  // 9-12. สูตรที่บังเอิญเจอจากการค้นหา 500 สูตรแบบสุ่ม (ใส่ไว้เพื่อความสนุก ไม่ใช่สูตรที่พิสูจน์แล้ว)
   const luckyPick = pad2(2 * parseInt(prevLast2, 10) - draw.day - draw.month + 97);
   conn.luckyPick = luckyPick;
-  rows.push({ label: 'สูตรสุ่มที่เคย "ดูดี" ที่สุดจากการค้นหา 500 สูตร (อันดับ 1)', value: luckyPick, formulaId: 'luckyPick', isDredged: true });
+  rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 1)', value: luckyPick, formulaId: 'luckyPick', isDredged: true, sampleSize: '500' });
 
   const luckyPick2 = pad2(2 * draw.day - 2 * draw.month - 3 * draw.yearBE2 + 75);
   conn.luckyPick2 = luckyPick2;
-  rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 2)', value: luckyPick2, formulaId: 'luckyPick2', isDredged: true });
+  rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 2)', value: luckyPick2, formulaId: 'luckyPick2', isDredged: true, sampleSize: '500' });
 
   if (prevFirst) {
     const prevFirstLast1 = parseInt(prevFirst.slice(-1), 10);
     const luckyPick3 = pad2(parseInt(prevLast2, 10) + prevFirstLast1 - draw.day + draw.month - 2 * draw.yearBE2 + 82);
     conn.luckyPick3 = luckyPick3;
-    rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 3)', value: luckyPick3, formulaId: 'luckyPick3', isDredged: true });
+    rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 3)', value: luckyPick3, formulaId: 'luckyPick3', isDredged: true, sampleSize: '500' });
 
     const luckyPick4 = pad2(-2 * parseInt(prevLast2, 10) - prevFirstLast1 + draw.day - draw.month - 3 * draw.yearBE2 + 49);
     conn.luckyPick4 = luckyPick4;
-    rows.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 4)', value: luckyPick4, formulaId: 'luckyPick4', isDredged: true });
+    rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 4)', value: luckyPick4, formulaId: 'luckyPick4', isDredged: true, sampleSize: '500' });
 
     const luckyPick5k = pad2(2 * parseInt(prevLast2, 10) - 2 * prevFirstLast1 + draw.day - draw.yearBE2 + 1);
     conn.luckyPick5k = luckyPick5k;
-    rows.push({ label: 'สูตรสุ่มจากการค้นหา 5,000 สูตร (อันดับ 1)', value: luckyPick5k, formulaId: 'luckyPick5k', isDredged: true });
+    rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 5,000 สูตร (อันดับ 1)', value: luckyPick5k, formulaId: 'luckyPick5k', isDredged: true, sampleSize: '5,000' });
   } else {
     conn.luckyPick3 = null;
     conn.luckyPick4 = null;
     conn.luckyPick5k = null;
   }
 
+  // ===== เลข 3 ตัวท้ายรางวัลที่ 1 =====
+  if (prevFirst3) {
+    conn.prevFirst3Repeat = prevFirst3;
+    rowsFirst3.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: prevFirst3, formulaId: 'firstRepeat' });
+  } else {
+    conn.prevFirst3Repeat = null;
+    rowsFirst3.push({ label: 'เลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อนออกซ้ำ', value: 'ไม่มีข้อมูลรางวัลที่ 1 งวดก่อนในประวัติ', na: true });
+  }
+
+  if (prevFirst3) {
+    const first3Unit = prevFirst3.slice(-1);
+    conn.first3Unit = first3Unit;
+    rowsFirst3.push({ label: 'หลักหน่วยเลข 3 ตัวท้ายรางวัลที่ 1 งวดก่อน', value: first3Unit, formulaId: 'firstUnitsOnly' });
+  } else {
+    conn.first3Unit = null;
+  }
+
   if (prevFirst3) {
     const prevFirst3Int = parseInt(prevFirst3, 10);
     const luckyFirst3_1 = pad3(-1 * parseInt(prevLast2, 10) + 3 * draw.day + 2 * draw.month - 2 * draw.yearBE2 + 149);
     conn.luckyFirst3_1 = luckyFirst3_1;
-    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 1)', value: luckyFirst3_1, formulaId: 'luckyFirst3_1', isDredged: true });
+    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 1)', value: luckyFirst3_1, formulaId: 'luckyFirst3_1', isDredged: true, sampleSize: '100,000' });
 
     const luckyFirst3_2 = pad3(-1 * parseInt(prevLast2, 10) + 3 * prevFirst3Int + 2 * draw.day - 2 * draw.month + 2 * draw.yearBE2 + 900);
     conn.luckyFirst3_2 = luckyFirst3_2;
-    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 2)', value: luckyFirst3_2, formulaId: 'luckyFirst3_2', isDredged: true });
+    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 2)', value: luckyFirst3_2, formulaId: 'luckyFirst3_2', isDredged: true, sampleSize: '100,000' });
 
     const luckyFirst3_3 = pad3(parseInt(prevLast2, 10) - 1 * prevFirst3Int - 3 * draw.day + draw.month + draw.yearBE2 + 134);
     conn.luckyFirst3_3 = luckyFirst3_3;
-    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 3)', value: luckyFirst3_3, formulaId: 'luckyFirst3_3', isDredged: true });
+    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 3)', value: luckyFirst3_3, formulaId: 'luckyFirst3_3', isDredged: true, sampleSize: '100,000' });
 
     const luckyFirst3_4 = pad3(-2 * draw.day - draw.month + 3 * draw.yearBE2 + 292);
     conn.luckyFirst3_4 = luckyFirst3_4;
-    rows.push({ label: 'สูตรเลข 3 ตัวท้ายฯ จากการค้นหา 100,000 สูตร (อันดับ 4)', value: luckyFirst3_4, formulaId: 'luckyFirst3_4', isDredged: true });
+    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 4)', value: luckyFirst3_4, formulaId: 'luckyFirst3_4', isDredged: true, sampleSize: '100,000' });
   } else {
     conn.luckyFirst3_1 = null;
     conn.luckyFirst3_2 = null;
@@ -594,11 +596,11 @@ function renderConnectionNumbers(prevLast2, draw) {
     });
   }
 
-  list.innerHTML = rows.map(r => {
+  function renderRow(r) {
     const s = r.formulaId ? statsById[r.formulaId] : null;
     let statLine = '';
     if (r.isDredged) {
-      statLine = `<div class="connection-stat" style="color:var(--maroon);">⚠ ได้จากการลองสุ่ม 500 สูตรแล้วเลือกตัวที่ดีที่สุดในข้อมูลเก่า — ไม่ผ่านนัยสำคัญทางสถิติ ไม่ควรเชื่อว่าจะถูกในอนาคต</div>`;
+      statLine = `<div class="connection-stat" style="color:var(--maroon);">⚠ ได้จากการลองสุ่ม ${r.sampleSize} สูตรแล้วเลือกตัวที่ดีที่สุดในข้อมูลเก่า — ไม่ผ่านนัยสำคัญทางสถิติ ไม่ควรเชื่อว่าจะถูกในอนาคต</div>`;
     } else if (s) {
       if (s.total > 0) {
         statLine = `<div class="connection-stat">ถูกจริง ${s.hits}/${s.total} งวด (${(s.rate * 100).toFixed(1)}%) · โอกาสสุ่มล้วนๆ ${(s.baseline * 100).toFixed(s.baseline < 0.01 ? 1 : 0)}%</div>`;
@@ -614,7 +616,14 @@ function renderConnectionNumbers(prevLast2, draw) {
       </div>
       <span class="value${r.na ? ' na' : ''}">${r.value}</span>
     </div>`;
-  }).join('');
+  }
+
+  list.innerHTML = `
+    <div class="connection-group-label">🔵 เลขท้าย 2 ตัว</div>
+    <div class="connection-sublist">${rowsLast2.map(renderRow).join('')}</div>
+    <div class="connection-group-label" style="margin-top:14px;">🟣 เลข 3 ตัวท้ายรางวัลที่ 1</div>
+    <div class="connection-sublist">${rowsFirst3.map(renderRow).join('')}</div>
+  `;
 
   block.style.display = 'block';
   return conn;
