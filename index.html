@@ -580,11 +580,22 @@ function renderConnectionNumbers(prevLast2, draw) {
     const luckyFirst3_4 = pad3(-2 * draw.day - draw.month + 3 * draw.yearBE2 + 292);
     conn.luckyFirst3_4 = luckyFirst3_4;
     rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 4)', value: luckyFirst3_4, formulaId: 'luckyFirst3_4', isDredged: true, sampleSize: '100,000' });
+
+    if (prevFirst && prevFirst.length === 6) {
+      const digits = prevFirst.split('').map(c => parseInt(c, 10));
+      const luckyFirst3_5 = pad3(-1 * digits[0] - 3 * digits[1] + 2 * digits[2] - 3 * digits[3] - 2 * digits[4] - 3 * digits[5]
+        - draw.day - 2 * draw.month - 2 * draw.yearBE2 + 590);
+      conn.luckyFirst3_5 = luckyFirst3_5;
+      rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 1,000,000 สูตร (ใช้เลข 6 หลักเต็มงวดก่อน, อันดับ 1)', value: luckyFirst3_5, formulaId: 'luckyFirst3_5', isDredged: true, sampleSize: '1,000,000' });
+    } else {
+      conn.luckyFirst3_5 = null;
+    }
   } else {
     conn.luckyFirst3_1 = null;
     conn.luckyFirst3_2 = null;
     conn.luckyFirst3_3 = null;
     conn.luckyFirst3_4 = null;
+    conn.luckyFirst3_5 = null;
   }
 
   // คำนวณอัตราถูกจริงจากประวัติ (backtest) ให้แต่ละสมมติฐาน
@@ -833,6 +844,21 @@ function buildFormulas() {
         if (!d) return [];
         return [pad3(-2 * d.day - d.month + 3 * d.yearBE2 + 292)];
       }
+    },
+    {
+      id: 'luckyFirst3_5',
+      label: 'สูตรเลข 3 ตัวท้ายรางวัลที่ 1 จากการสุ่มค้นหา 1,000,000 สูตร ใช้เลข 6 หลักเต็มของรางวัลที่1 งวดก่อน (อันดับ 1, ไม่ผ่านนัยสำคัญทางสถิติ)',
+      target: 'first3',
+      baseline: 0.001,
+      isDredged: true,
+      predict: (prev, next) => {
+        const d = parseDateParts(next.date);
+        if (!d || !prev.first || prev.first.length !== 6) return [];
+        const digits = prev.first.split('').map(c => parseInt(c, 10));
+        const val = -1 * digits[0] - 3 * digits[1] + 2 * digits[2] - 3 * digits[3] - 2 * digits[4] - 3 * digits[5]
+          - d.day - 2 * d.month - 2 * d.yearBE2 + 590;
+        return [pad3(val)];
+      }
     }
   );
 
@@ -904,6 +930,7 @@ function checkAccuracy() {
         if (p.conn.luckyFirst3_2) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 2)', hit: p.conn.luckyFirst3_2 === actualFirst3, predicted: p.conn.luckyFirst3_2 });
         if (p.conn.luckyFirst3_3) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 3)', hit: p.conn.luckyFirst3_3 === actualFirst3, predicted: p.conn.luckyFirst3_3 });
         if (p.conn.luckyFirst3_4) checks.push({ label: 'สูตรสุ่ม3หลัก 100k (อันดับ 4)', hit: p.conn.luckyFirst3_4 === actualFirst3, predicted: p.conn.luckyFirst3_4 });
+        if (p.conn.luckyFirst3_5) checks.push({ label: 'สูตรสุ่ม3หลัก 1M (6 หลักเต็ม)', hit: p.conn.luckyFirst3_5 === actualFirst3, predicted: p.conn.luckyFirst3_5 });
       }
 
       return { date: d, actualLast2, actualFirst3, checks };
