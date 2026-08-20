@@ -111,6 +111,21 @@
     color: var(--maroon-dark); white-space: nowrap;
   }
   .connection-row .value.na { font-family: 'Noto Sans Thai', sans-serif; font-weight: 400; font-size: 11.5px; color: var(--ink-soft); }
+  .connection-row.top-rank {
+    background: linear-gradient(135deg, #FBF0DC, #F7E3B8);
+    border: 1.5px solid var(--gold);
+    box-shadow: 0 1px 4px rgba(184, 134, 46, 0.25);
+  }
+  .connection-row.top-rank .value {
+    color: var(--maroon-dark);
+    font-size: 19px;
+  }
+  .top-rank-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    background: var(--gold); color: #FFFDF6;
+    padding: 1px 7px; border-radius: 10px; margin-left: 6px;
+    vertical-align: middle; letter-spacing: 0.3px;
+  }
   .connection-caption { font-size: 11px; color: var(--ink-soft); text-align: center; margin-top: 10px; line-height: 1.5; }
 
   .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
@@ -521,7 +536,7 @@ function renderConnectionNumbers(prevLast2, draw) {
 
   const luckyPick = pad2(2 * parseInt(prevLast2, 10) - draw.day - draw.month + 97);
   conn.luckyPick = luckyPick;
-  rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 1)', value: luckyPick, formulaId: 'luckyPick', isDredged: true, sampleSize: '500' });
+  rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 500 สูตร (อันดับ 1)', value: luckyPick, formulaId: 'luckyPick', isDredged: true, sampleSize: '500', isTopRank: true });
 
   const luckyPick2 = pad2(2 * draw.day - 2 * draw.month - 3 * draw.yearBE2 + 75);
   conn.luckyPick2 = luckyPick2;
@@ -539,7 +554,7 @@ function renderConnectionNumbers(prevLast2, draw) {
 
     const luckyPick5k = pad2(2 * parseInt(prevLast2, 10) - 2 * prevFirstLast1 + draw.day - draw.yearBE2 + 1);
     conn.luckyPick5k = luckyPick5k;
-    rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 5,000 สูตร (อันดับ 1)', value: luckyPick5k, formulaId: 'luckyPick5k', isDredged: true, sampleSize: '5,000' });
+    rowsLast2.push({ label: 'สูตรสุ่มจากการค้นหา 5,000 สูตร (อันดับ 1)', value: luckyPick5k, formulaId: 'luckyPick5k', isDredged: true, sampleSize: '5,000', isTopRank: true });
   } else {
     conn.luckyPick3 = null;
     conn.luckyPick4 = null;
@@ -567,7 +582,7 @@ function renderConnectionNumbers(prevLast2, draw) {
     const prevFirst3Int = parseInt(prevFirst3, 10);
     const luckyFirst3_1 = pad3(-1 * parseInt(prevLast2, 10) + 3 * draw.day + 2 * draw.month - 2 * draw.yearBE2 + 149);
     conn.luckyFirst3_1 = luckyFirst3_1;
-    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 1)', value: luckyFirst3_1, formulaId: 'luckyFirst3_1', isDredged: true, sampleSize: '100,000' });
+    rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 100,000 สูตร (อันดับ 1)', value: luckyFirst3_1, formulaId: 'luckyFirst3_1', isDredged: true, sampleSize: '100,000', isTopRank: true });
 
     const luckyFirst3_2 = pad3(-1 * parseInt(prevLast2, 10) + 3 * prevFirst3Int + 2 * draw.day - 2 * draw.month + 2 * draw.yearBE2 + 900);
     conn.luckyFirst3_2 = luckyFirst3_2;
@@ -586,7 +601,7 @@ function renderConnectionNumbers(prevLast2, draw) {
       const luckyFirst3_5 = pad3(-1 * digits[0] - 3 * digits[1] + 2 * digits[2] - 3 * digits[3] - 2 * digits[4] - 3 * digits[5]
         - draw.day - 2 * draw.month - 2 * draw.yearBE2 + 590);
       conn.luckyFirst3_5 = luckyFirst3_5;
-      rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 1,000,000 สูตร (ใช้เลข 6 หลักเต็มงวดก่อน, อันดับ 1)', value: luckyFirst3_5, formulaId: 'luckyFirst3_5', isDredged: true, sampleSize: '1,000,000' });
+      rowsFirst3.push({ label: 'สูตรสุ่มจากการค้นหา 1,000,000 สูตร (ใช้เลข 6 หลักเต็มงวดก่อน, อันดับ 1)', value: luckyFirst3_5, formulaId: 'luckyFirst3_5', isDredged: true, sampleSize: '1,000,000', isTopRank: true });
     } else {
       conn.luckyFirst3_5 = null;
     }
@@ -619,10 +634,11 @@ function renderConnectionNumbers(prevLast2, draw) {
         statLine = `<div class="connection-stat">ยังไม่มีคู่งวดพอให้ backtest</div>`;
       }
     }
+    const topBadge = r.isTopRank ? `<span class="top-rank-badge">🏆 อันดับ 1</span>` : '';
     return `
-    <div class="connection-row">
+    <div class="connection-row${r.isTopRank ? ' top-rank' : ''}">
       <div class="connection-text">
-        <span class="label">${r.label}</span>
+        <span class="label">${r.label}</span>${topBadge}
         ${statLine}
       </div>
       <span class="value${r.na ? ' na' : ''}">${r.value}</span>
